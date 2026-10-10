@@ -187,10 +187,11 @@ const { project, aspect = '4 / 5', eager = false, parallax = false, revealIndex 
     :global(html[data-card='zoom']) .card:hover .glow { opacity: 1; }
 
     /* 2. Tilt: card leans towards the cursor, glare follows */
-    :global(html[data-card='tilt']) .frame { transition-duration: 150ms; }
-    :global(html[data-card='tilt']) .card:hover .media {
-      transform: scale(1.06) translate(calc(var(--px, 0) * -8px), calc(var(--py, 0) * -8px));
+    :global(html[data-card='tilt']) .frame { transition: none; }
+    :global(html[data-card='tilt']) .media {
+      translate: calc(var(--px, 0) * -8px) calc(var(--py, 0) * -8px);
     }
+    :global(html[data-card='tilt']) .card:hover .media { transform: scale(1.06); }
     :global(html[data-card='tilt']) .card:hover .glow { opacity: 1; --glow-a: 0.22; }
 
     /* 3. Chip: "View case" pill replaces the cursor */
@@ -221,26 +222,44 @@ const { project, aspect = '4 / 5', eager = false, parallax = false, revealIndex 
 </style>
 
 <script>
+  // Tilt is driven by a small spring per card so entering and leaving ease
+  // in and out instead of jumping when the cursor moves between cards.
   if (matchMedia('(hover: hover)').matches) {
     const tilt = () => document.documentElement.dataset.card === 'tilt';
+    const MAX = 5; // degrees
+
     document.querySelectorAll<HTMLElement>('.card').forEach((card) => {
+      const cur = { x: 0, y: 0 };
+      const target = { x: 0, y: 0 };
+      let raf = 0;
+
+      const step = () => {
+        cur.x += (target.x - cur.x) * 0.12;
+        cur.y += (target.y - cur.y) * 0.12;
+        card.style.setProperty('--px', cur.x.toFixed(4));
+        card.style.setProperty('--py', cur.y.toFixed(4));
+        card.style.setProperty('--rx', `${(-cur.y * MAX).toFixed(3)}deg`);
+        card.style.setProperty('--ry', `${(cur.x * MAX).toFixed(3)}deg`);
+        const settled = Math.abs(target.x - cur.x) < 0.001 && Math.abs(target.y - cur.y) < 0.001;
+        raf = settled ? 0 : requestAnimationFrame(step);
+      };
+      const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
+
       card.addEventListener('pointermove', (e) => {
         const r = card.getBoundingClientRect();
         const x = e.clientX - r.left;
         const y = e.clientY - r.top;
         card.style.setProperty('--mx', `${x}px`);
         card.style.setProperty('--my', `${y}px`);
-        if (tilt()) {
-          const px = (x / r.width) * 2 - 1;
-          const py = (y / r.height) * 2 - 1;
-          card.style.setProperty('--px', px.toFixed(3));
-          card.style.setProperty('--py', py.toFixed(3));
-          card.style.setProperty('--rx', `${(-py * 5).toFixed(2)}deg`);
-          card.style.setProperty('--ry', `${(px * 5).toFixed(2)}deg`);
-        }
+        if (!tilt()) return;
+        target.x = (x / r.width) * 2 - 1;
+        target.y = (y / r.height) * 2 - 1;
+        kick();
       });
       card.addEventListener('pointerleave', () => {
-        for (const p of ['--rx', '--ry', '--px', '--py']) card.style.removeProperty(p);
+        target.x = 0;
+        target.y = 0;
+        kick();
       });
     });
   }
