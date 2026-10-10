@@ -4,7 +4,7 @@ import { bigProjects } from '../data/projects';
 ---
 
 <section class="big" aria-label="Featured projects">
-  {bigProjects.map((p) => <ProjectCard project={p} aspect="680 / 560" eager />)}
+  {bigProjects.map((p, i) => <ProjectCard project={p} aspect="680 / 560" eager parallax revealIndex={i} />)}
 </section>
 
 <style>

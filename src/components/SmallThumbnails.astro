@@ -4,7 +4,7 @@ import { smallProjects } from '../data/projects';
 ---
 
 <section class="small" aria-label="Projects">
-  {smallProjects.map((p) => <ProjectCard project={p} />)}
+  {smallProjects.map((p, i) => <ProjectCard project={p} revealIndex={i % 3} />)}
 </section>
 
 <style>

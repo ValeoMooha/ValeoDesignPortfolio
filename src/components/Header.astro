@@ -9,6 +9,7 @@ import avatar from '../assets/AvatarValeoGIF.gif';
       <span>Valeo</span>
     </a>
     <nav class="menu" aria-label="Main">
+      <span class="pill" aria-hidden="true"></span>
       <a href="/" class="active" aria-current="page">Work</a>
       <a href="https://mvaleo.com/tools/">Tools</a>
       <a href="https://mvaleo.com/about/">About</a>
@@ -19,10 +20,25 @@ import avatar from '../assets/AvatarValeoGIF.gif';
 
 <style>
   .header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     display: flex;
     justify-content: center;
-    padding: 22px 24px;
+    padding: 16px 24px;
     height: 64px;
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out),
+      backdrop-filter var(--dur) var(--ease-out);
+  }
+  /* Glass once the page scrolls under it */
+  .header.scrolled {
+    background-color: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(20px) saturate(1.6);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
   }
   .inner {
     display: flex;
@@ -34,17 +50,73 @@ import avatar from '../assets/AvatarValeoGIF.gif';
   }
   .logo { display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 16px; line-height: 1.4; }
   .logo img { border-radius: 8px; display: block; }
-  .menu { display: flex; gap: 36px; font-weight: 500; font-size: 16px; line-height: 26px; color: rgba(255, 255, 255, 0.4); }
-  .menu a { transition: color 0.2s; }
+
+  .menu {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 26px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .menu a {
+    position: relative;
+    z-index: 1;
+    padding: 3px 12px;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
   .menu a:hover, .menu .active { color: var(--bw-100); }
+  /* Highlight that glides to the hovered item */
+  .pill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--pill-w, 0);
+    transform: translateX(var(--pill-x, 0));
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    transition:
+      transform var(--dur) var(--ease-out),
+      width var(--dur) var(--ease-out);
+  }
+
   .contact {
     display: flex; align-items: center; justify-content: center;
     width: 86px; height: 32px; border-radius: 20px;
     background: var(--bw-100); color: #000;
     font-weight: 500; font-size: 15px; line-height: 26px;
+    transition: transform var(--dur-fast) var(--ease-out);
   }
+  .contact:active { transform: scale(0.96); }
+
   @media (max-width: 600px) {
-    .menu { gap: 20px; }
+    .menu { gap: 0; }
     .logo span { display: none; }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .pill, .header { transition: none; }
+  }
 </style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.header')!;
+  const onScroll = () => header.classList.toggle('scrolled', scrollY > 8);
+  onScroll();
+  addEventListener('scroll', onScroll, { passive: true });
+
+  const menu = document.querySelector<HTMLElement>('.menu')!;
+  const active = menu.querySelector<HTMLElement>('.active')!;
+  const moveTo = (el: HTMLElement) => {
+    menu.style.setProperty('--pill-x', `${el.offsetLeft}px`);
+    menu.style.setProperty('--pill-w', `${el.offsetWidth}px`);
+  };
+  document.fonts.ready.then(() => moveTo(active));
+  menu.querySelectorAll<HTMLElement>('a').forEach((a) => {
+    a.addEventListener('pointerenter', () => moveTo(a));
+    a.addEventListener('focus', () => moveTo(a));
+  });
+  menu.addEventListener('pointerleave', () => moveTo(active));
+  addEventListener('resize', () => moveTo(active));
+</script>

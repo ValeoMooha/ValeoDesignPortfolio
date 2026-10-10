@@ -20,6 +20,7 @@ import webbper from '../assets/webbper_prev.webp';
 
 export interface Project {
   title: string;
+  category: string;
   image: ImageMetadata;
   href: string;
 }
@@ -27,24 +28,24 @@ export interface Project {
 const work = (slug: string) => `https://mvaleo.com/works/${slug}/`;
 
 export const bigProjects: Project[] = [
-  { title: 'Zencastr', image: zencastr, href: work('zencastr') },
-  { title: 'Arrivals', image: arrivals, href: work('arrivals') },
+  { title: 'Zencastr', category: 'Podcast Recording App', image: zencastr, href: work('zencastr') },
+  { title: 'Arrivals', category: 'Travel Documentary Vlog', image: arrivals, href: work('arrivals') },
 ];
 
 export const smallProjects: Project[] = [
-  { title: 'VS Color', image: vsColor, href: work('vs-color') },
-  { title: 'Telegram', image: telegram, href: work('telegram') },
-  { title: 'Spotter', image: spotter, href: work('spotter') },
-  { title: 'Chipotto', image: chipotto, href: work('chipotto') },
-  { title: 'Dieter', image: dieter, href: work('dieter') },
-  { title: 'Smart Tools', image: smartTools, href: work('smart-tools') },
-  { title: 'Assam', image: assam, href: work('assam') },
-  { title: 'Active', image: active, href: work('active') },
-  { title: 'Smart Home', image: smartHome, href: work('smart-home') },
-  { title: 'TEDx', image: tedx, href: work('ted') },
-  { title: 'iWatch', image: iwatch, href: work('iwatch') },
-  { title: 'Mindojo', image: mindojo, href: work('mindojo') },
-  { title: 'Princess', image: princess, href: work('princess') },
-  { title: 'Serials', image: serials, href: work('serials') },
-  { title: 'Webbper', image: webbper, href: work('webbper') },
+  { title: 'VS Color', category: 'VS Code Color Picker', image: vsColor, href: work('vs-color') },
+  { title: 'Telegram', category: 'Messenger Redesign Concept', image: telegram, href: work('telegram') },
+  { title: 'Spotter', category: 'Travel Spots App', image: spotter, href: work('spotter') },
+  { title: 'Chipotto', category: 'Cafe Menu App', image: chipotto, href: work('chipotto') },
+  { title: 'Dieter', category: 'Finance App', image: dieter, href: work('dieter') },
+  { title: 'Smart Tools', category: 'Online Store', image: smartTools, href: work('smart-tools') },
+  { title: 'Assam', category: 'SaaS Software Aggregator', image: assam, href: work('assam') },
+  { title: 'Active', category: 'Activity Tracker App', image: active, href: work('active') },
+  { title: 'Smart Home', category: 'Smart Home App', image: smartHome, href: work('smart-home') },
+  { title: 'TEDx', category: 'TED Recommends Concept', image: tedx, href: work('ted') },
+  { title: 'iWatch', category: 'Apple Watch Screens Concept', image: iwatch, href: work('iwatch') },
+  { title: 'Mindojo', category: 'Educational Platform', image: mindojo, href: work('mindojo') },
+  { title: 'Princess', category: 'Rhythmic Gymnastics School', image: princess, href: work('princess') },
+  { title: 'Serials', category: 'TV Series App', image: serials, href: work('serials') },
+  { title: 'Webbper', category: 'Fitness CRM System', image: webbper, href: work('webbper') },
 ];

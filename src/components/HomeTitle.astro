@@ -1,6 +1,10 @@
 <section class="hero">
-  <h1>Hi! I’m Valeo.<br />Product &amp;<br />UX Designer.</h1>
-  <p>Design systems, Mobile, Web, Branding</p>
+  <h1>
+    <span class="line"><span style="--d: 0">Hi! I’m Valeo.</span></span>
+    <span class="line"><span style="--d: 1">Product &amp;</span></span>
+    <span class="line"><span style="--d: 2">UX Designer.</span></span>
+  </h1>
+  <p class="fade" style="--d: 3">Design systems, Mobile, Web, Branding</p>
 </section>
 
 <style>
@@ -12,11 +16,39 @@
     line-height: 1;
     color: var(--bw-100);
   }
+  /* Each line slides up from behind its own mask */
+  .line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .line > span {
+    display: inline-block;
+    animation: rise var(--dur-slow) var(--ease-out) both;
+    animation-delay: calc(150ms + var(--d) * 110ms);
+  }
   p {
     margin: clamp(16px, 2vw, 26px) 0 0;
     font-weight: 500;
     font-size: clamp(17px, 1.6vw, 22px);
     line-height: 1.2;
     color: var(--w-50);
+  }
+  .fade {
+    animation: fade-up var(--dur-slow) var(--ease-out) both;
+    animation-delay: calc(150ms + var(--d) * 110ms + 100ms);
+  }
+
+  @keyframes rise {
+    from { transform: translateY(105%); }
+    to { transform: none; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line > span, .fade { animation: none; }
   }
 </style>
