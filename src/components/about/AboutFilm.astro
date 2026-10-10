@@ -1,0 +1,157 @@
+---
+// Variant 5 — Film: the page plays like a movie. Opening titles, the
+// philosophy as a subtitle over a still, skills as chapters, a film strip of
+// photos that rolls sideways with the scroll and the career as end credits.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, portraits, skills } from '../../data/about';
+
+const roman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+const still = photos[1];
+---
+
+<section class="titles">
+  <p class="presents">a portfolio presents</p>
+  <h1>V A L E O</h1>
+  <p class="role">{intro.role} · {intro.location.replace('living in ', '')}</p>
+  <p class="now"><i></i>{intro.status} <a href={intro.resume.href}>{intro.resume.label} ↓</a></p>
+</section>
+
+<section class="scene">
+  <div class="frame">
+    <Image src={still} alt="" widths={[896]} sizes="(max-width: 1100px) 100vw, 1100px" />
+    <p class="subtitle">{philosophy}</p>
+    <span class="tc" aria-hidden="true">REC ● 00:01:24:07</span>
+  </div>
+</section>
+
+<section class="intro">
+  <Image class="headshot" src={portraits.camera} alt="Valeo with a camera" width={420} />
+  <p data-reveal>{bio}</p>
+</section>
+
+<section class="chapters">
+  {skills.map((s, i) => (
+    <article data-reveal>
+      <span class="ch">Chapter {roman[i]}</span>
+      <h2>{s.title}</h2>
+      <p>{s.description}</p>
+    </article>
+  ))}
+</section>
+
+<section class="reel" aria-label={intro.photosCaption}>
+  <div class="sticky">
+    <p class="reel-cap">{intro.photosCaption}</p>
+    <div class="strip">
+      {photos.map((p, i) => (
+        <figure>
+          <Image src={p} alt="" width={360} />
+          <figcaption>{String(i + 1).padStart(2, '0')}A</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="credits">
+  <h2>Starring in</h2>
+  <ul>
+    {experience.map((j) => (
+      <li data-reveal>
+        <span class="r">{j.role}</span>
+        <span class="c">{j.company}</span>
+        <span class="y">{j.period}</span>
+      </li>
+    ))}
+  </ul>
+  <p class="end">THE END<br /><small>…to be continued at your company</small></p>
+</section>
+
+<style>
+  section { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* Opening titles */
+  .titles { min-height: calc(100vh - 64px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .presents { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.4em; color: var(--w-50); animation: fade 2s ease 0.2s both; }
+  h1 { margin: 24px 0; font-size: clamp(56px, 12vw, 180px); font-weight: 700; letter-spacing: 0.08em; line-height: 1; animation: titles 2.4s var(--ease-out) 0.6s both; }
+  .role { margin: 0; font-size: 18px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--w-80); animation: fade 2s ease 1.6s both; }
+  .now { margin: 48px 0 0; display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; color: var(--w-60); animation: fade 2s ease 2.2s both; }
+  .now i { width: 8px; height: 8px; border-radius: 50%; background: #ff3b30; animation: rec 1.2s steps(1) infinite; }
+  .now a { color: var(--bw-100); border-bottom: 1px solid rgba(255, 255, 255, 0.4); }
+
+  /* Cinemascope still with a subtitle */
+  .scene { margin-top: 40px; }
+  .frame { position: relative; overflow: hidden; border-radius: 8px; aspect-ratio: 2.39 / 1; }
+  .frame :global(img) { width: 100%; height: 100%; object-fit: cover; scale: 1.1; }
+  @supports (animation-timeline: view()) {
+    .frame :global(img) { animation: push linear both; animation-timeline: view(); }
+  }
+  .subtitle { position: absolute; left: 8%; right: 8%; bottom: 10%; z-index: 2; margin: 0; text-align: center; font-size: clamp(16px, 2vw, 26px); font-weight: 500; color: #ffe066; text-shadow: 0 2px 4px #000, 0 0 2px #000; }
+  .tc { position: absolute; top: 14px; right: 18px; z-index: 2; font-size: 12px; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.8); font-variant-numeric: tabular-nums; }
+
+  .intro { display: grid; grid-template-columns: 320px 1fr; gap: 56px; align-items: center; margin-top: 120px; }
+  .intro :global(.headshot) { width: 100%; height: auto; border-radius: 8px; filter: saturate(0.9) contrast(1.05); }
+  .intro p { margin: 0; font-size: 22px; line-height: 1.6; color: var(--w-80); }
+
+  /* Chapters */
+  .chapters { margin-top: 140px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 48px; }
+  .chapters article { padding: 32px 0; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+  .ch { font-size: 12px; text-transform: uppercase; letter-spacing: 0.3em; color: #ffe066; }
+  .chapters h2 { margin: 12px 0 8px; font-size: 28px; letter-spacing: -0.01em; }
+  .chapters p { margin: 0; color: var(--w-60); line-height: 1.5; }
+
+  /* Film strip rolls sideways while the section is pinned */
+  .reel { max-width: none; padding: 0; margin-top: 140px; height: 300vh; }
+  .reel .sticky { position: sticky; top: 64px; height: calc(100vh - 64px); display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+  .reel-cap { max-width: 1100px; width: 100%; margin: 0 auto 24px; padding: 0 24px; color: var(--w-60); }
+  .strip {
+    display: flex; gap: 12px; width: max-content;
+    padding: 34px 16px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 10px, #ddd 10px 22px, transparent 22px 34px) top 10px left 0 / 100% 12px no-repeat,
+      repeating-linear-gradient(90deg, transparent 0 10px, #ddd 10px 22px, transparent 22px 34px) bottom 10px left 0 / 100% 12px no-repeat,
+      #111;
+    border-top: 1px solid #222; border-bottom: 1px solid #222;
+  }
+  @supports (animation-timeline: view()) {
+    .strip { animation: roll linear both; animation-timeline: --reel; animation-range: contain 0% contain 100%; }
+    .reel { view-timeline-name: --reel; }
+  }
+  @supports not (animation-timeline: view()) {
+    .reel { height: auto; }
+    .reel .sticky { position: static; height: auto; overflow-x: auto; }
+  }
+  .strip figure { margin: 0; position: relative; }
+  .strip :global(img) { display: block; height: 46vh; width: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 2px; filter: sepia(0.15) saturate(1.1); transition: filter var(--dur) var(--ease-out); }
+  .strip figure:hover :global(img) { filter: none; }
+  .strip figcaption { position: absolute; left: 6px; bottom: -26px; font-size: 11px; color: #e9a33b; letter-spacing: 0.1em; font-variant-numeric: tabular-nums; }
+
+  /* End credits */
+  .credits { margin-top: 120px; text-align: center; }
+  .credits h2 { margin: 0 0 48px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.4em; color: var(--w-50); font-weight: 500; }
+  .credits ul { list-style: none; margin: 0; padding: 0; }
+  .credits li { display: grid; grid-template-columns: 1fr 1fr; column-gap: 32px; padding: 14px 0; }
+  .credits .r { text-align: right; color: var(--w-60); text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px; padding-top: 4px; }
+  .credits .c { text-align: left; font-size: 22px; font-weight: 700; }
+  .credits .y { grid-column: 2; text-align: left; color: var(--w-50); font-size: 13px; }
+  .end { margin: 120px 0 0; font-size: 40px; font-weight: 700; letter-spacing: 0.3em; }
+  .end small { display: block; margin-top: 12px; font-size: 15px; font-weight: 400; letter-spacing: 0.05em; color: var(--w-60); }
+
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes titles { from { opacity: 0; letter-spacing: 0.5em; filter: blur(12px); } to { opacity: 1; letter-spacing: 0.08em; filter: blur(0); } }
+  @keyframes rec { 50% { opacity: 0; } }
+  @keyframes push { from { scale: 1.2; } to { scale: 1; } }
+  @keyframes roll { from { transform: translateX(10vw); } to { transform: translateX(calc(-100% + 90vw)); } }
+
+  @media (max-width: 800px) {
+    .intro, .chapters { grid-template-columns: 1fr; }
+    .credits li { grid-template-columns: 1fr; }
+    .credits .r, .credits .c, .credits .y { text-align: center; grid-column: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .presents, h1, .role, .now, .now i, .frame :global(img) { animation: none; }
+    .reel { height: auto; }
+    .reel .sticky { position: static; height: auto; overflow-x: auto; }
+    .strip { animation: none; }
+  }
+</style>

@@ -1,0 +1,170 @@
+---
+// Variant 2 — Bento: the whole story on one screen-and-a-half of tiles.
+// A living photo tile, a status tile, counters, skills and a compact career.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, portraits, skills, stats } from '../../data/about';
+
+const slideshow = photos.filter((p) => p !== portraits.main).slice(0, 8);
+---
+
+<section class="bento">
+  <div class="tile portrait" data-reveal>
+    <Image src={portraits.main} alt="Valeo" widths={[480, 896]} sizes="(max-width: 900px) 100vw, 400px" loading="eager" />
+    <span class="badge">📍 Spain</span>
+  </div>
+
+  <div class="tile hello" data-reveal style="--reveal-i: 1">
+    <h1>{intro.greeting}<br /><span>{intro.role}</span><br /><span class="muted">{intro.location}</span></h1>
+  </div>
+
+  <div class="tile status" data-reveal style="--reveal-i: 2">
+    <span class="live"><i></i>Available</span>
+    <p>{intro.status}</p>
+    <a class="resume" href={intro.resume.href}>{intro.resume.label} ↓</a>
+  </div>
+
+  {stats.map((s, i) => (
+    <div class:list={['tile', 'stat', `stat-${i}`]} data-reveal style={`--reveal-i: ${i}`}>
+      <span class="value">{s.value}</span>
+      <span class="label">{s.label}</span>
+    </div>
+  ))}
+
+  <div class="tile quote" data-reveal>
+    <span class="mark" aria-hidden="true">“</span>
+    <p>{philosophy.replace('My philosophy: ', '')}</p>
+  </div>
+
+  <div class="tile slideshow" data-reveal style="--reveal-i: 1" aria-label={intro.photosCaption}>
+    {slideshow.map((p, i) => (
+      <Image src={p} alt="" width={600} style={`--i: ${i}; --n: ${slideshow.length}`} />
+    ))}
+    <span class="cap">{intro.photosCaption}</span>
+  </div>
+
+  <div class="tile about" data-reveal>
+    <h2>About</h2>
+    <p>{bio}</p>
+  </div>
+
+  <div class="tile skills" data-reveal style="--reveal-i: 1">
+    <h2>Skills and expertise</h2>
+    <ul>
+      {skills.map((s) => (
+        <li><span class="glyph">{s.icon}</span><span><b>{s.title}</b><small>{s.description}</small></span></li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="tile career" data-reveal style="--reveal-i: 2">
+    <h2>Work experience</h2>
+    <ul>
+      {experience.map((j) => (
+        <li><b>{j.company}</b><span>{j.role}</span><time>{j.period}</time></li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas:
+      'portrait hello hello status'
+      'portrait stat0 stat1 stat2'
+      'quote quote slide slide'
+      'about about slide slide'
+      'skills skills career career';
+    gap: 16px;
+    max-width: 1280px;
+    margin: 48px auto 0;
+    padding: 0 24px;
+  }
+  .tile {
+    position: relative;
+    padding: 28px;
+    border-radius: 28px;
+    background: rgba(18, 18, 22, 0.75);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    overflow: hidden;
+    transition: border-color var(--dur) var(--ease-out);
+  }
+  .tile:hover { border-color: rgba(255, 255, 255, 0.16); }
+  h2 { margin: 0 0 16px; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--w-50); }
+
+  .portrait { grid-area: portrait; padding: 0; min-height: 420px; }
+  .portrait :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: scale 1.2s var(--ease-out); }
+  .portrait:hover :global(img) { scale: 1.05; }
+  .badge { position: absolute; left: 16px; bottom: 16px; padding: 6px 12px; border-radius: 100px; background: rgba(0, 0, 0, 0.5); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 13px; }
+
+  .hello { grid-area: hello; display: flex; align-items: flex-end; background: radial-gradient(120% 140% at 0% 0%, rgba(109, 91, 255, 0.35), transparent 60%), rgba(18, 18, 22, 0.75); }
+  h1 { margin: 0; font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -0.02em; }
+  .muted { color: var(--w-50); }
+
+  .status { grid-area: status; display: flex; flex-direction: column; gap: 12px; }
+  .live { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #3bd16f; }
+  .live i { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #3bd16f; }
+  .live i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #3bd16f; animation: ping 2.4s var(--ease-out) infinite; }
+  .status p { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .resume { margin-top: auto; align-self: flex-start; padding: 10px 18px; border-radius: 100px; background: var(--bw-100); color: #000; font-weight: 500; font-size: 14px; transition: scale var(--dur) var(--ease-out); }
+  .resume:hover { scale: 1.05; }
+
+  .stat { display: flex; flex-direction: column; justify-content: flex-end; min-height: 160px; }
+  .stat-0 { grid-area: stat0; background: linear-gradient(160deg, rgba(255, 143, 177, 0.25), transparent 60%), rgba(18, 18, 22, 0.75); }
+  .stat-1 { grid-area: stat1; background: linear-gradient(160deg, rgba(91, 225, 255, 0.22), transparent 60%), rgba(18, 18, 22, 0.75); }
+  .stat-2 { grid-area: stat2; background: linear-gradient(160deg, rgba(255, 196, 92, 0.22), transparent 60%), rgba(18, 18, 22, 0.75); }
+  .value { font-size: 64px; font-weight: 700; line-height: 1; }
+  .label { color: var(--w-60); margin-top: 6px; }
+
+  .quote { grid-area: quote; display: flex; flex-direction: column; justify-content: center; }
+  .mark { position: absolute; top: -20px; right: 20px; font-size: 200px; line-height: 1; color: rgba(255, 255, 255, 0.06); font-weight: 700; }
+  .quote p { margin: 0; font-size: clamp(22px, 2.2vw, 30px); font-weight: 700; line-height: 1.25; }
+
+  /* Photos cross-fade one after another */
+  .slideshow { grid-area: slide; padding: 0; min-height: 440px; }
+  .slideshow :global(img) {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    opacity: 0;
+    animation: show calc(var(--n) * 4s) infinite;
+    animation-delay: calc(var(--i) * 4s);
+  }
+  .cap { position: absolute; left: 16px; right: 16px; bottom: 16px; padding: 10px 14px; border-radius: 14px; background: rgba(0, 0, 0, 0.45); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); font-size: 14px; }
+
+  .about { grid-area: about; }
+  .about p { margin: 0; color: var(--w-80); line-height: 1.6; font-size: 17px; }
+
+  .skills { grid-area: skills; }
+  .skills ul, .career ul { list-style: none; margin: 0; padding: 0; }
+  .skills li { display: flex; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+  .glyph { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #6d5bff, #ff8fb1); }
+  .skills b { display: block; }
+  .skills small { display: block; color: var(--w-60); font-size: 14px; line-height: 1.45; margin-top: 2px; }
+
+  .career { grid-area: career; }
+  .career li { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 12px; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 15px; }
+  .career span { color: var(--w-60); }
+  .career time { color: var(--w-50); font-variant-numeric: tabular-nums; }
+  .career li:first-child time { color: #3bd16f; }
+
+  /* 8 photos, each on screen for 1/8 of the cycle with a soft overlap */
+  @keyframes show {
+    0% { opacity: 0; scale: 1.08; }
+    2% { opacity: 1; }
+    12.5% { opacity: 1; }
+    15% { opacity: 0; scale: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes ping { 0% { transform: scale(1); opacity: 0.6; } 70%, 100% { transform: scale(2.6); opacity: 0; } }
+
+  @media (max-width: 900px) {
+    .bento { grid-template-columns: 1fr 1fr; grid-template-areas: 'portrait portrait' 'hello hello' 'status status' 'stat0 stat1' 'stat2 stat2' 'quote quote' 'slide slide' 'about about' 'skills skills' 'career career'; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slideshow :global(img) { animation: none; }
+    .slideshow :global(img:first-child) { opacity: 1; }
+    .live i::after { animation: none; }
+  }
+</style>

@@ -1,23 +1,10 @@
 ---
 // Shell for the Tools page.
-import Base from './Base.astro';
-import Background from '../components/Background.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import PageLayout from './PageLayout.astro';
 import ToolsHero from '../components/tools/ToolsHero.astro';
-
-interface Props {
-  hero?: boolean;
-}
-const { hero = true } = Astro.props;
 ---
 
-<Base title="Tools — Valeo" description="Figma plugins, templates and color systems built by Valeo.">
-  <Background />
-  <Header current="tools" />
-  <main>
-    {hero && <ToolsHero />}
-    <slot />
-  </main>
-  <Footer />
-</Base>
+<PageLayout title="Tools — Valeo" description="Figma plugins, templates and color systems built by Valeo." current="tools">
+  <ToolsHero />
+  <slot />
+</PageLayout>

@@ -1,0 +1,20 @@
+---
+// Wraps an About variant with the page shell and the variant switcher.
+import PageLayout from '../../layouts/PageLayout.astro';
+import VariantNav from '../VariantNav.astro';
+
+interface Props { variant: number }
+const { variant } = Astro.props;
+const variants = [
+  { label: 'Кино', href: '/about/' },
+  { label: 'Бенто', href: '/about/v2/' },
+  { label: 'Журнал', href: '/about/v3/' },
+  { label: 'Созвездие', href: '/about/v4/' },
+  { label: 'Плёнка', href: '/about/v5/' },
+];
+---
+
+<PageLayout title="About — Valeo" description="Valeo is a multidisciplinary product designer living in Spain." current="about">
+  <slot />
+  <VariantNav slot="after" title="About" current={variant} variants={variants} />
+</PageLayout>

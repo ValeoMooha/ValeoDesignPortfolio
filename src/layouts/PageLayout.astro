@@ -1,0 +1,24 @@
+---
+// Shell for inner pages: animated background, header, footer.
+import Base from './Base.astro';
+import Background from '../components/Background.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  current: 'work' | 'tools' | 'about';
+}
+const { title, description, current } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <Background />
+  <Header current={current} />
+  <main>
+    <slot />
+  </main>
+  <Footer />
+  <slot name="after" />
+</Base>

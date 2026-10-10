@@ -1,0 +1,139 @@
+---
+// Variant 3 — Magazine: an editorial spread. Oversized headline, a sticky
+// portrait beside the story, a pull quote, a numbered skills index, a career
+// table and a masonry photo essay.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, portraits, skills } from '../../data/about';
+
+const [quoteLead, quoteRest] = philosophy.split(': ');
+---
+
+<header class="masthead">
+  <p class="kicker">Issue 01 — About</p>
+  <h1 class="headline">
+    <span class="line"><span>Valeo</span></span>
+    <span class="line"><span class="outline">Mooha</span></span>
+  </h1>
+  <p class="dek">{intro.greeting} {intro.role}, {intro.location}. {intro.status}.</p>
+</header>
+
+<section class="spread">
+  <figure class="sticky">
+    <Image src={portraits.alt} alt="Valeo" widths={[480, 896]} sizes="(max-width: 800px) 100vw, 460px" loading="eager" />
+    <figcaption>Self-portrait. <a href={intro.resume.href}>{intro.resume.label} ↓</a></figcaption>
+  </figure>
+
+  <div class="story">
+    <p class="lead" data-reveal>{bio}</p>
+
+    <blockquote data-reveal>
+      <span class="q" aria-hidden="true">“</span>
+      <p>{quoteRest}</p>
+      <cite>{quoteLead}</cite>
+    </blockquote>
+
+    <h2 data-reveal>Skills and expertise</h2>
+    <ol class="index">
+      {skills.map((s, i) => (
+        <li data-reveal>
+          <span class="n">{String(i + 1).padStart(2, '0')}</span>
+          <span class="t">{s.title}</span>
+          <span class="d">{s.description}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section class="career">
+  <h2 data-reveal>Work experience</h2>
+  <table>
+    <tbody>
+      {experience.map((j) => (
+        <tr data-reveal>
+          <td class="p">{j.period}</td>
+          <th scope="row">{j.company}</th>
+          <td class="r">{j.role}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</section>
+
+<section class="essay">
+  <h2 data-reveal>Photo essay <small>{intro.photosCaption}</small></h2>
+  <div class="masonry">
+    {photos.map((p, i) => (
+      <figure data-reveal style={`--reveal-i: ${i % 3}`}>
+        <Image src={p} alt="" width={420} />
+        <figcaption>{String(i + 1).padStart(2, '0')}</figcaption>
+      </figure>
+    ))}
+  </div>
+</section>
+
+<style>
+  .masthead, .spread, .career, .essay { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+  .masthead { padding-top: 48px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding-bottom: 32px; }
+  .kicker { margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; color: var(--w-50); }
+  .headline { margin: 0; font-size: clamp(80px, 17vw, 260px); line-height: 0.85; letter-spacing: -0.05em; font-weight: 700; }
+  .line { display: block; overflow: hidden; }
+  .line > span { display: inline-block; animation: rise 1.1s var(--ease-out) both; }
+  .line:nth-child(2) > span { animation-delay: 120ms; }
+  .outline { color: transparent; -webkit-text-stroke: 2px rgba(255, 255, 255, 0.85); }
+  .dek { max-width: 620px; margin: 24px 0 0; font-size: 20px; line-height: 1.45; color: var(--w-80); }
+
+  .spread { display: grid; grid-template-columns: 460px 1fr; gap: 64px; margin-top: 64px; align-items: start; }
+  .sticky { position: sticky; top: 88px; margin: 0; }
+  .sticky :global(img) { display: block; width: 100%; height: auto; border-radius: 4px; filter: grayscale(0.25) contrast(1.05); }
+  .sticky figcaption { margin-top: 12px; font-size: 13px; color: var(--w-50); }
+  .sticky a { color: var(--bw-100); text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
+
+  .lead { margin: 0; font-size: 22px; line-height: 1.6; color: var(--w-80); }
+  .lead::first-letter { float: left; font-size: 92px; line-height: 0.82; font-weight: 700; margin: 8px 12px 0 0; color: var(--bw-100); }
+
+  blockquote { position: relative; margin: 72px 0; padding: 32px 0; border-top: 2px solid var(--bw-100); border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+  .q { position: absolute; top: -12px; right: 0; font-size: 160px; line-height: 1; font-weight: 700; color: rgba(255, 255, 255, 0.08); }
+  blockquote p { margin: 0; font-size: clamp(28px, 3vw, 42px); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+  cite { display: block; margin-top: 16px; font-style: normal; font-size: 13px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--w-50); }
+
+  h2 { margin: 0 0 24px; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: var(--w-50); }
+  h2 small { display: block; margin-top: 8px; font-size: 15px; text-transform: none; letter-spacing: 0; color: var(--w-60); }
+  .index { list-style: none; margin: 0; padding: 0; }
+  .index li { display: grid; grid-template-columns: 48px 1fr; column-gap: 16px; padding: 20px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); transition: padding var(--dur) var(--ease-out); }
+  .index li:hover { padding-left: 12px; }
+  .n { grid-row: span 2; color: var(--w-50); font-variant-numeric: tabular-nums; }
+  .t { font-size: 24px; font-weight: 700; }
+  .d { color: var(--w-60); margin-top: 4px; line-height: 1.5; }
+
+  .career { margin-top: 140px; }
+  table { width: 100%; border-collapse: collapse; }
+  tr { border-top: 1px solid rgba(255, 255, 255, 0.1); transition: background var(--dur) var(--ease-out); }
+  tr:hover { background: rgba(255, 255, 255, 0.04); }
+  td, th { padding: 22px 8px; text-align: left; vertical-align: baseline; }
+  th { font-size: clamp(22px, 2.6vw, 36px); font-weight: 700; letter-spacing: -0.01em; }
+  .p { width: 160px; color: var(--w-50); font-variant-numeric: tabular-nums; }
+  .r { color: var(--w-60); text-align: right; }
+
+  .essay { margin-top: 140px; }
+  .masonry { columns: 3 280px; column-gap: 16px; }
+  .masonry figure { break-inside: avoid; margin: 0 0 16px; position: relative; overflow: hidden; border-radius: 4px; }
+  .masonry :global(img) { display: block; width: 100%; height: auto; transition: scale 1s var(--ease-out), filter var(--dur) var(--ease-out); }
+  .masonry figure:hover :global(img) { scale: 1.04; }
+  .masonry figcaption { position: absolute; left: 10px; bottom: 8px; font-size: 12px; color: rgba(255, 255, 255, 0.8); mix-blend-mode: difference; }
+
+  @keyframes rise { from { transform: translateY(100%); } to { transform: none; } }
+
+  @media (max-width: 900px) {
+    .spread { grid-template-columns: 1fr; }
+    .sticky { position: static; }
+    .r { text-align: left; }
+    tr { display: grid; }
+    td, th { padding: 4px 8px; }
+    tr { padding: 16px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line > span { animation: none; }
+  }
+</style>

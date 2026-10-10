@@ -1,0 +1,232 @@
+---
+// Variant 1 — Cinema: a scroll-driven story. The portrait opens like a curtain,
+// the philosophy lights up word by word, the timeline draws itself and the
+// photos drift past in two rows.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, portraits, skills, stats } from '../../data/about';
+
+const words = philosophy.split(' ');
+const rowA = photos.slice(0, 13);
+const rowB = photos.slice(13);
+---
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>
+      <span class="line"><span style="--d: 0">{intro.greeting}</span></span>
+      <span class="line"><span style="--d: 1">{intro.role}</span></span>
+      <span class="line muted"><span style="--d: 2">{intro.location}</span></span>
+    </h1>
+    <div class="actions">
+      <span class="status"><i></i>{intro.status}</span>
+      <a class="resume" href={intro.resume.href}>{intro.resume.label} <span aria-hidden="true">↓</span></a>
+    </div>
+  </div>
+  <div class="portrait">
+    <Image src={portraits.main} alt="Valeo" widths={[480, 896]} sizes="(max-width: 800px) 90vw, 440px" loading="eager" />
+  </div>
+</section>
+
+<section class="philosophy" aria-label="Philosophy">
+  <p>{words.map((w) => <span class="w">{w} </span>)}</p>
+</section>
+
+<section class="bio">
+  <p data-reveal>{bio}</p>
+  <ul class="stats">
+    {stats.map((s, i) => (
+      <li data-reveal style={`--reveal-i: ${i}`}>
+        <span class="value" data-count={parseInt(s.value)}>{s.value}</span>
+        <span class="label">{s.label}</span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<section class="skills">
+  <h2>Skills and expertise</h2>
+  <div class="skill-grid">
+    {skills.map((s, i) => (
+      <article class="skill" data-reveal style={`--reveal-i: ${i % 3}`}>
+        <span class="glyph" aria-hidden="true">{s.icon}</span>
+        <h3>{s.title}</h3>
+        <p>{s.description}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="experience">
+  <h2>Work experience</h2>
+  <div class="timeline">
+    <span class="track" aria-hidden="true"><span class="fill"></span></span>
+    <ol>
+    {experience.map((job) => (
+      <li data-reveal>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="period">{job.period}</span>
+        <span class="company">{job.company}</span>
+        <span class="role">{job.role}</span>
+      </li>
+    ))}
+    </ol>
+  </div>
+</section>
+
+<section class="photos" aria-label="Photos">
+  <p class="caption">{intro.photosCaption}</p>
+  {[rowA, rowB].map((row, r) => (
+    <div class:list={['marquee', { reverse: r === 1 }]}>
+      <div class="belt">
+        {[...row, ...row].map((p, i) => (
+          <Image src={p} alt="" width={300} loading="lazy" aria-hidden={i >= row.length ? 'true' : undefined} />
+        ))}
+      </div>
+    </div>
+  ))}
+</section>
+
+<style>
+  section { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  h2 { font-size: clamp(28px, 3vw, 40px); margin: 0 0 40px; letter-spacing: -0.01em; }
+
+  /* Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: center;
+    gap: 48px;
+    min-height: calc(100vh - 64px);
+    padding-top: 24px;
+  }
+  h1 { margin: 0; font-size: clamp(44px, 6vw, 84px); line-height: 1.02; letter-spacing: -0.02em; }
+  .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
+  .line > span { display: inline-block; animation: rise var(--dur-slow) var(--ease-out) both; animation-delay: calc(150ms + var(--d) * 110ms); }
+  .muted { color: var(--w-50); }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; animation: fade-up var(--dur-slow) var(--ease-out) 600ms both; }
+  .status {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 18px; border-radius: 100px;
+    background: linear-gradient(180deg, var(--bw-15), var(--bw-10));
+    color: var(--w-80); font-size: 15px;
+  }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: #3bd16f; box-shadow: 0 0 10px #3bd16f; }
+  .resume {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 100px;
+    background: var(--bw-100); color: #000; font-weight: 500; font-size: 15px;
+    transition: scale var(--dur) var(--ease-out);
+  }
+  .resume:hover { scale: 1.04; }
+  .resume span { transition: transform var(--dur) var(--ease-out); }
+  .resume:hover span { transform: translateY(2px); }
+
+  /* Portrait opens like a curtain, then drifts with the scroll */
+  .portrait {
+    border-radius: 28px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    animation: curtain 1.4s var(--ease-out) 200ms both;
+  }
+  .portrait :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; scale: 1.15; animation: settle 1.8s var(--ease-out) 200ms both; }
+
+  /* Philosophy: words light up as the paragraph scrolls through */
+  .philosophy { padding-top: 20vh; padding-bottom: 20vh; }
+  .philosophy p { margin: 0; font-size: clamp(30px, 4.2vw, 60px); font-weight: 700; line-height: 1.15; letter-spacing: -0.015em; }
+  .w { opacity: 0.15; }
+  @supports (animation-timeline: view()) {
+    .w { animation: word linear both; animation-timeline: view(); animation-range: cover 20% cover 45%; }
+  }
+  @supports not (animation-timeline: view()) { .w { opacity: 1; } }
+
+  /* Bio and stats */
+  .bio { display: grid; grid-template-columns: 1.4fr 1fr; gap: 64px; align-items: start; }
+  .bio > p { margin: 0; font-size: 22px; line-height: 1.55; color: var(--w-80); }
+  .stats { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; }
+  .stats li { display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 20px; }
+  .value { font-size: 56px; font-weight: 700; line-height: 1; min-width: 2.2ch; background: linear-gradient(135deg, #fff, #b9a6ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .label { color: var(--w-60); }
+
+  /* Skills */
+  .skills { margin-top: 160px; }
+  .skill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .skill {
+    padding: 28px; border-radius: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), translate var(--dur) var(--ease-out);
+  }
+  .skill:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.16); translate: 0 -4px; }
+  .glyph { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #6d5bff, #ff8fb1); font-size: 20px; }
+  .skill h3 { margin: 20px 0 8px; font-size: 20px; }
+  .skill p { margin: 0; color: var(--w-60); line-height: 1.5; }
+
+  /* Timeline draws itself as the list scrolls */
+  .experience { margin-top: 160px; }
+  .timeline { position: relative; padding-left: 40px; }
+  .timeline ol { list-style: none; margin: 0; padding: 0; }
+  .track { position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; }
+  .fill { position: absolute; inset: 0; background: linear-gradient(#b9a6ff, #ff8fb1); transform-origin: top; transform: scaleY(1); }
+  @supports (animation-timeline: view()) {
+    .fill { animation: draw linear both; animation-timeline: view(); animation-range: entry 30% cover 70%; }
+  }
+  .timeline li { position: relative; display: grid; grid-template-columns: 160px 1fr 1fr; gap: 24px; padding: 18px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+  .dot { position: absolute; left: -38px; top: 24px; width: 12px; height: 12px; border-radius: 50%; background: #000; border: 2px solid #b9a6ff; }
+  .timeline li:first-of-type .dot { background: #3bd16f; border-color: #3bd16f; box-shadow: 0 0 12px #3bd16f; }
+  .period { color: var(--w-50); font-variant-numeric: tabular-nums; }
+  .company { font-weight: 700; font-size: 18px; }
+  .role { color: var(--w-60); }
+
+  /* Photo marquee */
+  .photos { max-width: none; padding: 0; margin-top: 160px; overflow: hidden; }
+  .caption { max-width: 1200px; margin: 0 auto 32px; padding: 0 24px; color: var(--w-60); font-size: 18px; }
+  .marquee { overflow: hidden; margin-bottom: 16px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .belt { display: flex; gap: 16px; width: max-content; animation: slide 90s linear infinite; }
+  .reverse .belt { animation-direction: reverse; }
+  .marquee:hover .belt { animation-play-state: paused; }
+  .belt :global(img) { display: block; width: 240px; height: 300px; object-fit: cover; border-radius: 16px; transition: scale var(--dur) var(--ease-out); }
+  .belt :global(img:hover) { scale: 1.04; }
+
+  @keyframes rise { from { transform: translateY(105%); } to { transform: none; } }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @keyframes curtain { from { clip-path: inset(50% 0 50% 0 round 28px); } to { clip-path: inset(0 0 0 0 round 28px); } }
+  @keyframes settle { to { scale: 1; } }
+  @keyframes word { to { opacity: 1; } }
+  @keyframes draw { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  @media (max-width: 800px) {
+    .hero, .bio { grid-template-columns: 1fr; }
+    .hero { min-height: 0; padding-top: 48px; }
+    .skill-grid { grid-template-columns: 1fr; }
+    .timeline li { grid-template-columns: 1fr; gap: 4px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line > span, .actions, .portrait, .portrait :global(img), .belt, .fill { animation: none; }
+    .w { animation: none; opacity: 1; }
+    .portrait :global(img) { scale: 1; }
+  }
+</style>
+
+<script>
+  // Count the stats up when they come into view.
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      io.unobserve(e.target);
+      const el = e.target as HTMLElement;
+      const end = Number(el.dataset.count);
+      const suffix = el.textContent!.replace(/\d+/, '');
+      const start = performance.now();
+      const step = (now: number) => {
+        const k = Math.min((now - start) / 1200, 1);
+        el.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))) + suffix;
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+  }, { threshold: 0.6 });
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('[data-count]').forEach((el) => io.observe(el));
+  }
+</script>
