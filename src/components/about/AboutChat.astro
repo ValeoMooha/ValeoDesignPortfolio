@@ -1,0 +1,160 @@
+---
+// Variant 8 — Chat: getting to know Valeo as a conversation. Messages arrive
+// with a typing indicator as you scroll, the visitor's questions sit on the
+// right, and the thread ends with quick replies.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, portraits, skills } from '../../data/about';
+
+type Msg =
+  | { from: 'me' | 'them'; text: string }
+  | { from: 'them'; kind: 'photos' }
+  | { from: 'them'; kind: 'skills' }
+  | { from: 'them'; kind: 'jobs' };
+
+const thread: Msg[] = [
+  { from: 'them', text: `${intro.greeting} 👋` },
+  { from: 'them', text: `${intro.role}, ${intro.location}.` },
+  { from: 'me', text: 'Nice to meet you! What do you do exactly?' },
+  { from: 'them', text: bio },
+  { from: 'me', text: 'How do you think about design?' },
+  { from: 'them', text: philosophy },
+  { from: 'me', text: 'What are you best at?' },
+  { from: 'them', kind: 'skills' },
+  { from: 'me', text: 'Where have you worked?' },
+  { from: 'them', kind: 'jobs' },
+  { from: 'me', text: 'Anything outside of screens?' },
+  { from: 'them', text: `${intro.photosCaption} 📷` },
+  { from: 'them', kind: 'photos' },
+  { from: 'me', text: 'Are you open to new work?' },
+  { from: 'them', text: `Yes! ${intro.status}. Here’s my resume 👇` },
+];
+---
+
+<section class="chat">
+  <header class="head">
+    <Image class="ava" src={portraits.main} alt="" width={96} height={96} loading="eager" />
+    <div>
+      <b>Valeo</b>
+      <span class="online"><i></i>online</span>
+    </div>
+  </header>
+
+  <ol class="thread">
+    {thread.map((m, i) => (
+      <li class:list={['msg', m.from]} data-msg style={`--i: ${i}`}>
+        {m.from === 'them' && <span class="typing" aria-hidden="true"><i></i><i></i><i></i></span>}
+        <div class="bubble">
+          {'text' in m && <p>{m.text}</p>}
+          {'kind' in m && m.kind === 'skills' && (
+            <ul class="skills">
+              {skills.map((s) => <li><span>{s.icon}</span><b>{s.title}</b><small>{s.description}</small></li>)}
+            </ul>
+          )}
+          {'kind' in m && m.kind === 'jobs' && (
+            <ul class="jobs">
+              {experience.map((j) => <li><b>{j.company}</b><small>{j.role} · {j.period}</small></li>)}
+            </ul>
+          )}
+          {'kind' in m && m.kind === 'photos' && (
+            <div class="grid">
+              {photos.slice(0, 9).map((p) => <Image src={p} alt="" width={200} />)}
+            </div>
+          )}
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <div class="replies" data-msg>
+    <a href={intro.resume.href}>📄 {intro.resume.label}</a>
+    <a href="https://mvaleo.com/contact/">💬 Say hi</a>
+    <a href="https://www.linkedin.com/in/vmooha/" target="_blank" rel="noopener">in LinkedIn</a>
+  </div>
+</section>
+
+<style>
+  .chat { max-width: 720px; margin: 0 auto; padding: 32px 24px 0; }
+  .head {
+    position: sticky; top: 76px; z-index: 3;
+    display: flex; align-items: center; gap: 12px;
+    width: fit-content; margin: 0 auto 32px; padding: 8px 20px 8px 8px;
+    border-radius: 100px; background: rgba(28, 28, 32, 0.8);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .head :global(.ava) { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+  .head div { display: flex; flex-direction: column; }
+  .online { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #3bd16f; }
+  .online i { width: 6px; height: 6px; border-radius: 50%; background: #3bd16f; }
+
+  .thread { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .msg { display: flex; flex-direction: column; max-width: 80%; }
+  .them { align-self: flex-start; align-items: flex-start; }
+  .me { align-self: flex-end; align-items: flex-end; margin-top: 18px; }
+  .me + .them { margin-top: 18px; }
+  .bubble { padding: 12px 16px; border-radius: 22px; line-height: 1.5; font-size: 16px; }
+  .bubble p { margin: 0; }
+  .them .bubble { background: rgba(58, 58, 64, 0.85); border-bottom-left-radius: 6px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .me .bubble { background: linear-gradient(180deg, #3d8bff, #0a6cff); border-bottom-right-radius: 6px; }
+
+  /* Arrival: the typing dots show first, then the bubble pops in */
+  .typing { display: none; gap: 4px; padding: 12px 16px; border-radius: 22px; background: rgba(58, 58, 64, 0.85); }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.6); animation: dot 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: 0.15s; }
+  .typing i:nth-child(3) { animation-delay: 0.3s; }
+  :global(.js) [data-msg] .bubble, :global(.js) .replies { opacity: 0; transform: translateY(10px) scale(0.96); transform-origin: bottom left; }
+  :global(.js) .me .bubble { transform-origin: bottom right; }
+  [data-msg].typing-now .typing { display: inline-flex; }
+  [data-msg].typing-now .bubble { display: none; }
+  [data-msg].shown .bubble, .replies.shown { opacity: 1; transform: none; transition: opacity 0.35s var(--ease-out), transform 0.5s var(--ease-out); }
+
+  .skills, .jobs { list-style: none; margin: 0; padding: 0; }
+  .skills li { display: grid; grid-template-columns: 28px 1fr; column-gap: 8px; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+  .skills li:first-child, .jobs li:first-child { border-top: 0; }
+  .skills span { grid-row: span 2; }
+  small { display: block; color: var(--w-60); font-size: 14px; }
+  .jobs li { padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: -6px -10px; }
+  .grid :global(img) { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+
+  .replies { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+  .replies a { padding: 10px 16px; border-radius: 100px; border: 1px solid rgba(61, 139, 255, 0.6); color: #8bb8ff; font-weight: 500; transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out); }
+  .replies a:hover { background: #3d8bff; color: #fff; }
+
+  @keyframes dot { 0%, 60%, 100% { opacity: 0.3; transform: none; } 30% { opacity: 1; transform: translateY(-3px); } }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) [data-msg] .bubble, :global(.js) .replies { opacity: 1; transform: none; }
+  }
+</style>
+
+<script>
+  // Reveal messages one by one as they scroll in; replies from Valeo type first.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const queue: HTMLElement[] = [];
+  let busy = false;
+  const next = () => {
+    const el = queue.shift();
+    if (!el) { busy = false; return; }
+    busy = true;
+    // Type slower for the next message, faster when the visitor scrolls ahead.
+    const typing = el.classList.contains('them') ? (queue.length > 1 ? 120 : 650) : 0;
+    if (typing) el.classList.add('typing-now');
+    setTimeout(() => {
+      el.classList.remove('typing-now');
+      el.classList.add('shown');
+      setTimeout(next, queue.length > 1 ? 60 : 180);
+    }, typing);
+  };
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      io.unobserve(e.target);
+      queue.push(e.target as HTMLElement);
+    }
+    if (!busy) next();
+  }, { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll<HTMLElement>('[data-msg]').forEach((el) => {
+    if (reduce) el.classList.add('shown');
+    else io.observe(el);
+  });
+</script>

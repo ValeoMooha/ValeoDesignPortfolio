@@ -1,0 +1,194 @@
+---
+// Variant 6 — Desktop: the About page as a tiny operating system. Each part of
+// the story is a window you can drag around and bring to the front; the dock
+// brings a window back into focus.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, portraits, skills } from '../../data/about';
+
+const windows = [
+  { id: 'hello', title: 'Hello.txt', x: 4, y: 4, w: 420 },
+  { id: 'portrait', title: 'Valeo.jpg', x: 38, y: 2, w: 300 },
+  { id: 'philosophy', title: 'Philosophy.md', x: 64, y: 8, w: 380 },
+  { id: 'skills', title: 'Skills', x: 6, y: 50, w: 460 },
+  { id: 'experience', title: 'Experience', x: 40, y: 44, w: 520 },
+  { id: 'photos', title: 'Photos — 14 countries', x: 66, y: 52, w: 400 },
+];
+const dock = [
+  { id: 'hello', icon: '📝' },
+  { id: 'portrait', icon: '🖼️' },
+  { id: 'philosophy', icon: '💡' },
+  { id: 'skills', icon: '🧰' },
+  { id: 'experience', icon: '📁' },
+  { id: 'photos', icon: '📷' },
+];
+---
+
+<section class="desktop" aria-label="About Valeo">
+  {windows.map((w, i) => (
+    <article class="win" id={`win-${w.id}`} style={`--x: ${w.x}%; --y: ${w.y}%; --w: ${w.w}px; --i: ${i}`} tabindex="-1">
+      <header class="bar" data-drag>
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="title">{w.title}</span>
+      </header>
+      <div class="body">
+        {w.id === 'hello' && (
+          <div class="txt">
+            <h1>{intro.greeting} {intro.role}, {intro.location}.</h1>
+            <p>{bio}</p>
+            <p class="status"><i></i>{intro.status}</p>
+            <a class="btn" href={intro.resume.href}>{intro.resume.label} ↓</a>
+          </div>
+        )}
+        {w.id === 'portrait' && <Image class="photo" src={portraits.main} alt="Valeo" width={600} loading="eager" />}
+        {w.id === 'philosophy' && <p class="md"><span># </span>{philosophy}</p>}
+        {w.id === 'skills' && (
+          <ul class="apps">
+            {skills.map((s) => (
+              <li title={s.description}><span class="app-icon">{s.icon}</span><span>{s.short}</span></li>
+            ))}
+          </ul>
+        )}
+        {w.id === 'experience' && (
+          <table class="finder">
+            <thead><tr><th>Name</th><th>Role</th><th>Date</th></tr></thead>
+            <tbody>
+              {experience.map((j) => (
+                <tr><td>📁 {j.company}</td><td>{j.role}</td><td>{j.period}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {w.id === 'photos' && (
+          <div class="thumbs">
+            {photos.slice(0, 12).map((p) => <Image src={p} alt="" width={160} />)}
+          </div>
+        )}
+      </div>
+    </article>
+  ))}
+
+  <nav class="dock" aria-label="Windows">
+    {dock.map((d) => (
+      <button type="button" data-focus={d.id} aria-label={d.id}><span>{d.icon}</span></button>
+    ))}
+  </nav>
+</section>
+
+<style>
+  .desktop {
+    position: relative;
+    max-width: 1400px;
+    height: max(900px, calc(100vh - 64px));
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .win {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: min(var(--w), calc(100vw - 48px));
+    border-radius: 14px;
+    background: rgba(28, 28, 32, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    backdrop-filter: blur(24px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    animation: open 0.7s var(--ease-out) both;
+    animation-delay: calc(200ms + var(--i) * 110ms);
+    translate: var(--dx, 0) var(--dy, 0);
+  }
+  .win.focused { border-color: rgba(255, 255, 255, 0.22); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  .win.pulse { animation: pulse 0.5s var(--ease-out); }
+  .bar { display: flex; align-items: center; gap: 12px; height: 36px; padding: 0 12px; background: rgba(255, 255, 255, 0.04); border-bottom: 1px solid rgba(255, 255, 255, 0.06); cursor: grab; user-select: none; touch-action: none; }
+  .bar:active { cursor: grabbing; }
+  .lights { display: flex; gap: 7px; }
+  .lights i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+  .lights i:nth-child(2) { background: #febc2e; }
+  .lights i:nth-child(3) { background: #28c840; }
+  .title { flex: 1; text-align: center; margin-right: 50px; font-size: 13px; color: var(--w-60); }
+  .body { max-height: 420px; overflow: auto; }
+
+  .txt { padding: 20px; }
+  h1 { margin: 0 0 12px; font-size: 22px; line-height: 1.25; }
+  .txt p { margin: 0 0 12px; color: var(--w-80); line-height: 1.55; font-size: 15px; }
+  .status { display: flex; align-items: center; gap: 8px; color: #3bd16f !important; }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: #3bd16f; box-shadow: 0 0 8px #3bd16f; }
+  .btn { display: inline-block; padding: 8px 16px; border-radius: 8px; background: #0a84ff; color: #fff; font-weight: 500; font-size: 14px; }
+  .body :global(.photo) { display: block; width: 100%; height: auto; }
+  .md { margin: 0; padding: 22px; font-size: 22px; font-weight: 700; line-height: 1.3; }
+  .md span { color: #0a84ff; }
+
+  .apps { list-style: none; margin: 0; padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 8px; }
+  .apps li { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; text-align: center; cursor: default; }
+  .app-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; font-size: 24px; background: linear-gradient(135deg, #6d5bff, #ff8fb1); box-shadow: 0 8px 20px rgba(109, 91, 255, 0.35); transition: scale var(--dur) var(--ease-out); }
+  .apps li:hover .app-icon { scale: 1.12; }
+
+  .finder { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .finder th { position: sticky; top: 0; background: rgba(40, 40, 46, 0.95); text-align: left; font-weight: 500; color: var(--w-50); padding: 8px 12px; }
+  .finder td { padding: 7px 12px; white-space: nowrap; }
+  .finder tbody tr:nth-child(odd) { background: rgba(255, 255, 255, 0.03); }
+  .finder tbody tr:hover { background: #0a84ff; }
+  .finder td:nth-child(2), .finder td:nth-child(3) { color: var(--w-60); }
+  .finder tbody tr:hover td { color: #fff; }
+
+  .thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; }
+  .thumbs :global(img) { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; transition: scale var(--dur) var(--ease-out); }
+  .thumbs :global(img:hover) { scale: 1.06; }
+
+  .dock {
+    position: absolute; left: 50%; bottom: 24px; translate: -50% 0;
+    display: flex; gap: 8px; padding: 8px; border-radius: 22px;
+    background: rgba(40, 40, 46, 0.6); border: 1px solid rgba(255, 255, 255, 0.12);
+    -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+  }
+  .dock button { width: 52px; height: 52px; border: 0; border-radius: 14px; background: rgba(255, 255, 255, 0.08); font-size: 26px; cursor: pointer; transition: scale 0.25s var(--ease-out), translate 0.25s var(--ease-out); }
+  .dock button:hover { scale: 1.25; translate: 0 -8px; }
+
+  @keyframes open { from { opacity: 0; scale: 0.9; } to { opacity: 1; scale: 1; } }
+  @keyframes pulse { 50% { scale: 1.02; } }
+
+  @media (max-width: 900px) {
+    .desktop { height: auto; display: grid; gap: 16px; padding-top: 24px; }
+    .win { position: relative; left: auto; top: auto; width: auto; translate: none; }
+    .dock { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .win { animation: none; } }
+</style>
+
+<script>
+  // Drag windows by their title bar and bring the touched window to the front.
+  let z = 10;
+  const focus = (win: HTMLElement) => {
+    document.querySelectorAll('.win.focused').forEach((w) => w.classList.remove('focused'));
+    win.classList.add('focused');
+    win.style.zIndex = String(++z);
+  };
+  document.querySelectorAll<HTMLElement>('.win').forEach((win) => {
+    win.addEventListener('pointerdown', () => focus(win));
+    const bar = win.querySelector<HTMLElement>('[data-drag]')!;
+    let sx = 0, sy = 0, dx = 0, dy = 0;
+    bar.addEventListener('pointerdown', (e) => {
+      if (matchMedia('(max-width: 900px)').matches) return;
+      bar.setPointerCapture(e.pointerId);
+      sx = e.clientX - dx;
+      sy = e.clientY - dy;
+    });
+    bar.addEventListener('pointermove', (e) => {
+      if (!bar.hasPointerCapture(e.pointerId)) return;
+      dx = e.clientX - sx;
+      dy = e.clientY - sy;
+      win.style.setProperty('--dx', `${dx}px`);
+      win.style.setProperty('--dy', `${dy}px`);
+    });
+  });
+  document.querySelectorAll<HTMLButtonElement>('[data-focus]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const win = document.getElementById(`win-${btn.dataset.focus}`)!;
+      focus(win);
+      win.classList.remove('pulse');
+      void win.offsetWidth;
+      win.classList.add('pulse');
+    });
+  });
+</script>

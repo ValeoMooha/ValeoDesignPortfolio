@@ -1,0 +1,132 @@
+---
+// Variant 9 — Horizon: the page is pinned and the story slides sideways,
+// one wide panel per chapter, with a progress line on top.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, portraits, skills, stats } from '../../data/about';
+
+const collage = photos.slice(0, 7);
+---
+
+<section class="horizon">
+  <div class="pin">
+    <span class="progress" aria-hidden="true"></span>
+    <div class="track">
+      <article class="panel p-hello">
+        <div>
+          <p class="num">01 — Hello</p>
+          <h1>{intro.greeting}<br /><span>{intro.role}</span><br /><span class="muted">{intro.location}</span></h1>
+          <p class="status"><i></i>{intro.status}</p>
+          <a class="resume" href={intro.resume.href}>{intro.resume.label} ↓</a>
+        </div>
+        <Image class="portrait" src={portraits.main} alt="Valeo" widths={[480, 896]} sizes="40vw" loading="eager" />
+      </article>
+
+      <article class="panel p-quote">
+        <p class="num">02 — Philosophy</p>
+        <p class="quote">{philosophy.replace('My philosophy: ', '')}</p>
+      </article>
+
+      <article class="panel p-bio">
+        <p class="num">03 — About</p>
+        <p class="bio">{bio}</p>
+        <ul class="stats">
+          {stats.map((s) => <li><b>{s.value}</b><span>{s.label}</span></li>)}
+        </ul>
+      </article>
+
+      <article class="panel p-skills">
+        <p class="num">04 — Skills</p>
+        <ul>
+          {skills.map((s) => <li><span class="ic">{s.icon}</span><b>{s.title}</b><small>{s.description}</small></li>)}
+        </ul>
+      </article>
+
+      <article class="panel p-jobs">
+        <p class="num">05 — Experience</p>
+        <ol>
+          {experience.map((j) => <li><time>{j.period}</time><b>{j.company}</b><small>{j.role}</small></li>)}
+        </ol>
+      </article>
+
+      <article class="panel p-photos">
+        <p class="num">06 — {intro.photosCaption}</p>
+        <div class="collage">
+          {collage.map((p, i) => <Image src={p} alt="" width={420} style={`--i: ${i}`} />)}
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Six panels: the section is tall enough to scroll through all of them */
+  .horizon { height: 600vh; view-timeline-name: --horizon; }
+  .pin { position: sticky; top: 64px; height: calc(100vh - 64px); overflow: hidden; }
+  .track { display: flex; height: 100%; width: 600vw; }
+  @supports (animation-timeline: view()) {
+    .track { animation: slide linear both; animation-timeline: --horizon; animation-range: contain 0% contain 100%; }
+    .progress { animation: grow linear both; animation-timeline: --horizon; animation-range: contain 0% contain 100%; }
+  }
+  @supports not (animation-timeline: view()) {
+    .horizon { height: auto; }
+    .pin { position: static; height: auto; overflow: visible; }
+    .track { flex-direction: column; width: auto; }
+    .panel { width: auto !important; min-height: 100vh; }
+  }
+  .progress { position: absolute; top: 0; left: 0; z-index: 2; height: 2px; width: 100%; background: linear-gradient(90deg, #6d5bff, #ff8fb1, #ffc45c); transform-origin: left; transform: scaleX(0); }
+
+  .panel { position: relative; width: 100vw; height: 100%; padding: 6vh max(24px, 8vw); display: flex; flex-direction: column; justify-content: center; }
+  .num { margin: 0 0 24px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.25em; color: var(--w-50); }
+
+  .p-hello { flex-direction: row; align-items: center; justify-content: space-between; gap: 6vw; }
+  h1 { margin: 0; font-size: clamp(44px, 6.4vw, 104px); line-height: 0.98; letter-spacing: -0.03em; }
+  .muted { color: var(--w-50); }
+  .status { display: flex; align-items: center; gap: 10px; margin: 32px 0 16px; color: var(--w-80); }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: #3bd16f; box-shadow: 0 0 10px #3bd16f; }
+  .resume { display: inline-block; padding: 12px 22px; border-radius: 100px; background: var(--bw-100); color: #000; font-weight: 500; }
+  .p-hello :global(.portrait) { height: 70vh; width: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 32px; }
+
+  .quote { margin: 0; max-width: 1400px; font-size: clamp(36px, 5.6vw, 96px); font-weight: 700; line-height: 1.02; letter-spacing: -0.03em; background: linear-gradient(100deg, #fff 20%, #b9a6ff 55%, #ff8fb1 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  .bio { margin: 0; max-width: 900px; font-size: clamp(22px, 2.2vw, 34px); line-height: 1.45; }
+  .stats { list-style: none; display: flex; gap: 6vw; margin: 56px 0 0; padding: 0; }
+  .stats b { display: block; font-size: clamp(48px, 6vw, 96px); line-height: 1; }
+  .stats span { color: var(--w-60); }
+
+  .p-skills ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 48px; max-width: 1400px; }
+  .p-skills li { display: flex; flex-direction: column; gap: 8px; }
+  .ic { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #6d5bff, #ff8fb1); font-size: 20px; margin-bottom: 8px; }
+  .p-skills b { font-size: 22px; }
+  small { color: var(--w-60); font-size: 15px; line-height: 1.5; }
+
+  .p-jobs ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 48px; max-width: 1400px; }
+  .p-jobs li { display: grid; padding: 16px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+  .p-jobs time { font-size: 13px; color: var(--w-50); }
+  .p-jobs b { font-size: 20px; margin: 4px 0; }
+
+  .collage { position: relative; height: 62vh; }
+  .collage :global(img) {
+    position: absolute; height: 34vh; width: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 16px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    left: calc(var(--i) * 12%); top: calc(mod(var(--i), 2) * 22vh + 2vh);
+    rotate: calc((mod(var(--i), 3) - 1) * 4deg);
+    transition: scale var(--dur) var(--ease-out), rotate var(--dur) var(--ease-out);
+  }
+  .collage :global(img:hover) { scale: 1.12; rotate: 0deg; z-index: 2; }
+
+  @keyframes slide { to { transform: translateX(-500vw); } }
+  @keyframes grow { to { transform: scaleX(1); } }
+
+  @media (max-width: 900px) {
+    .p-hello { flex-direction: column; justify-content: center; }
+    .p-hello :global(.portrait) { height: 36vh; }
+    .p-skills ul, .p-jobs ol { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .p-skills small { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .horizon { height: auto; }
+    .pin { position: static; height: auto; overflow: visible; }
+    .track { flex-direction: column; width: auto; animation: none; }
+    .panel { width: auto; min-height: 100vh; }
+  }
+</style>

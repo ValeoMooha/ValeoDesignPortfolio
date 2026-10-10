@@ -1,0 +1,140 @@
+---
+// Variant 7 — Tunnel: photos hang on a 3D ring around the visitor. Scrolling
+// turns the ring while the story changes in the middle, chapter by chapter.
+import { Image } from 'astro:assets';
+import { bio, experience, intro, philosophy, photos, skills } from '../../data/about';
+
+const ring = photos.slice(0, 18);
+const step = 360 / ring.length;
+---
+
+<section class="tunnel">
+  <div class="stage">
+    <div class="ring" style={`--n: ${ring.length}`}>
+      {ring.map((p, i) => (
+        <figure style={`--a: ${i * step}deg`}>
+          <Image src={p} alt="" width={320} loading="eager" />
+        </figure>
+      ))}
+    </div>
+
+    <div class="center">
+      <div class="chapter c1">
+        <p class="eyebrow">{intro.location}</p>
+        <h1>{intro.greeting}<br />{intro.role}</h1>
+      </div>
+      <div class="chapter c2"><p class="big">{philosophy}</p></div>
+      <div class="chapter c3"><p class="mid">{bio}</p></div>
+      <div class="chapter c4">
+        <p class="eyebrow">{intro.status}</p>
+        <a class="resume" href={intro.resume.href}>{intro.resume.label} ↓</a>
+      </div>
+    </div>
+    <span class="hint" aria-hidden="true">Scroll</span>
+  </div>
+</section>
+
+<section class="after">
+  <div class="cols">
+    <div>
+      <h2>Skills and expertise</h2>
+      <ul class="skills">
+        {skills.map((s) => (
+          <li data-reveal><span>{s.icon}</span><b>{s.title}</b><small>{s.description}</small></li>
+        ))}
+      </ul>
+    </div>
+    <div>
+      <h2>Work experience</h2>
+      <ul class="jobs">
+        {experience.map((j) => (
+          <li data-reveal><time>{j.period}</time><b>{j.company}</b><small>{j.role}</small></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Tall section so the ring has scroll distance to turn through */
+  .tunnel { height: 500vh; view-timeline-name: --tunnel; }
+  .stage {
+    position: sticky; top: 64px; height: calc(100vh - 64px);
+    display: grid; place-items: center;
+    overflow: hidden;
+    perspective: 1100px;
+  }
+  .ring {
+    position: absolute; width: 300px; height: 380px;
+    transform-style: preserve-3d;
+    animation: idle 80s linear infinite;
+  }
+  .ring figure {
+    position: absolute; inset: 0; margin: 0;
+    /* Facing inwards: the visitor stands inside the ring and the cards behind them stay hidden */
+    transform: rotateY(var(--a)) translateZ(calc(-1 * clamp(480px, 52vw, 820px)));
+    backface-visibility: hidden;
+  }
+  .ring :global(img) { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); filter: brightness(0.75); }
+  /* Dark pool behind the text so it stays readable over the photos */
+  .stage::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(42% 38% at 50% 50%, rgba(0, 0, 0, 0.75), transparent 75%); }
+
+  @supports (animation-timeline: view()) {
+    .ring { animation: turn linear both; animation-timeline: --tunnel; animation-range: contain 0% contain 100%; }
+    .chapter { animation: chapter linear both; animation-timeline: --tunnel; }
+    .c1 { animation-range: contain 0% contain 25%; animation-name: chapter-first; }
+    .c2 { animation-range: contain 22% contain 50%; }
+    .c3 { animation-range: contain 47% contain 75%; }
+    .c4 { animation-range: contain 72% contain 100%; animation-name: chapter-last; }
+  }
+  @supports not (animation-timeline: view()) {
+    .tunnel { height: auto; }
+    .stage { position: relative; top: 0; height: 100vh; }
+    .chapter { display: none; }
+    .c1 { display: block; }
+  }
+
+  .center { position: relative; z-index: 2; width: min(760px, 86vw); height: 320px; display: grid; place-items: center; text-align: center; }
+  .chapter { grid-area: 1 / 1; }
+  .eyebrow { margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.25em; font-size: 13px; color: var(--w-60); }
+  h1 { margin: 0; font-size: clamp(44px, 6vw, 88px); line-height: 1; letter-spacing: -0.02em; text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); }
+  .big { margin: 0; font-size: clamp(26px, 3.4vw, 46px); font-weight: 700; line-height: 1.2; text-shadow: 0 10px 40px rgba(0, 0, 0, 0.9); }
+  .mid { margin: 0; font-size: clamp(18px, 1.8vw, 24px); line-height: 1.55; color: var(--w-80); text-shadow: 0 6px 30px #000; padding: 24px; border-radius: 20px; background: rgba(0, 0, 0, 0.45); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .resume { display: inline-block; padding: 12px 24px; border-radius: 100px; background: var(--bw-100); color: #000; font-weight: 500; font-size: 16px; }
+  .hint { position: absolute; bottom: 24px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3em; color: var(--w-50); animation: bob 2s ease-in-out infinite; }
+
+  .after { max-width: 1200px; margin: 0 auto; padding: 120px 24px 0; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  h2 { margin: 0 0 24px; font-size: 32px; }
+  .skills, .jobs { list-style: none; margin: 0; padding: 0; }
+  .skills li { display: grid; grid-template-columns: 40px 1fr; column-gap: 12px; padding: 16px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+  .skills span { grid-row: span 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); }
+  small { color: var(--w-60); line-height: 1.45; }
+  .jobs li { display: grid; grid-template-columns: 120px 1fr; column-gap: 12px; padding: 14px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+  .jobs time { grid-row: span 2; color: var(--w-50); font-size: 14px; }
+
+  @keyframes turn { from { transform: rotateY(0deg); } to { transform: rotateY(-360deg); } }
+  @keyframes idle { to { transform: rotateY(-360deg); } }
+  @keyframes chapter {
+    0% { opacity: 0; transform: translateY(40px) scale(0.96); filter: blur(8px); }
+    20%, 80% { opacity: 1; transform: none; filter: blur(0); }
+    100% { opacity: 0; transform: translateY(-40px) scale(1.02); filter: blur(8px); }
+  }
+  @keyframes chapter-first {
+    0%, 80% { opacity: 1; transform: none; filter: blur(0); }
+    100% { opacity: 0; transform: translateY(-40px) scale(1.02); filter: blur(8px); }
+  }
+  @keyframes chapter-last {
+    0% { opacity: 0; transform: translateY(40px); filter: blur(8px); }
+    25%, 100% { opacity: 1; transform: none; filter: blur(0); }
+  }
+  @keyframes bob { 50% { translate: 0 6px; } }
+
+  @media (max-width: 800px) {
+    .cols { grid-template-columns: 1fr; }
+    .ring { width: 140px; height: 180px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ring, .hint { animation: none; }
+  }
+</style>
