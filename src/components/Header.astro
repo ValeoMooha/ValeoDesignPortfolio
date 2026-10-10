@@ -1,0 +1,50 @@
+---
+import avatar from '../assets/AvatarValeoGIF.gif';
+---
+
+<header class="header">
+  <div class="inner">
+    <a class="logo" href="/">
+      <img src={avatar.src} width="32" height="32" alt="" />
+      <span>Valeo</span>
+    </a>
+    <nav class="menu" aria-label="Main">
+      <a href="/" class="active" aria-current="page">Work</a>
+      <a href="https://mvaleo.com/tools/">Tools</a>
+      <a href="https://mvaleo.com/about/">About</a>
+    </nav>
+    <a class="contact" href="https://mvaleo.com/contact/">Contact</a>
+  </div>
+</header>
+
+<style>
+  .header {
+    display: flex;
+    justify-content: center;
+    padding: 22px 24px;
+    height: 64px;
+  }
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1144px;
+    height: 32px;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 16px; line-height: 1.4; }
+  .logo img { border-radius: 8px; display: block; }
+  .menu { display: flex; gap: 36px; font-weight: 500; font-size: 16px; line-height: 26px; color: rgba(255, 255, 255, 0.4); }
+  .menu a { transition: color 0.2s; }
+  .menu a:hover, .menu .active { color: var(--bw-100); }
+  .contact {
+    display: flex; align-items: center; justify-content: center;
+    width: 86px; height: 32px; border-radius: 20px;
+    background: var(--bw-100); color: #000;
+    font-weight: 500; font-size: 15px; line-height: 26px;
+  }
+  @media (max-width: 600px) {
+    .menu { gap: 20px; }
+    .logo span { display: none; }
+  }
+</style>

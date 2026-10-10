@@ -1,0 +1,36 @@
+---
+const links = [
+  { label: 'Instagram', href: 'https://www.instagram.com/valeo_mooha/' },
+  { label: 'Telegram', href: 'https://t.me/ValeoMooha' },
+  { label: 'WhatsApp', href: 'https://wa.me/380992637222' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/vmooha/' },
+  { label: 'Dribbble', href: 'https://dribbble.com/Mooha' },
+];
+---
+
+<footer class="footer">
+  <nav class="links" aria-label="Social">
+    {links.map((l) => <a href={l.href} rel="noopener" target="_blank">{l.label}</a>)}
+  </nav>
+  <a class="contact" href="https://mvaleo.com/contact/">Contact</a>
+</footer>
+
+<style>
+  .footer {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; padding: 96px 24px 48px;
+  }
+  .links {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px 32px; max-width: 360px;
+    font-weight: 500; font-size: 16px; line-height: 26px; color: var(--w-60);
+  }
+  .links a { transition: color 0.2s; }
+  .links a:hover { color: var(--bw-100); }
+  .contact {
+    display: flex; align-items: center; justify-content: center;
+    width: 86px; height: 32px; border-radius: 20px;
+    background: var(--bw-100); color: #000;
+    font-weight: 500; font-size: 15px; line-height: 26px;
+  }
+</style>

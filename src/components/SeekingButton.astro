@@ -1,0 +1,25 @@
+<div class="wrap">
+  <div class="badge">
+    <span class="dot" aria-hidden="true"></span>
+    <span>Seeking for full-time remote position</span>
+  </div>
+</div>
+
+<style>
+  .wrap { display: flex; justify-content: center; margin-top: clamp(32px, 4vw, 58px); padding: 0 24px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 11px;
+    height: 40px; padding: 7px 20px 7px 16px;
+    border-radius: 100px;
+    background: linear-gradient(180deg, var(--bw-15), var(--bw-10));
+    color: var(--w-80);
+    font-size: 14px; line-height: 26px; font-weight: 400;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #3bd16f;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+</style>

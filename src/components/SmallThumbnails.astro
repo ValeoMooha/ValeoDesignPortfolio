@@ -1,0 +1,21 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import { smallProjects } from '../data/projects';
+---
+
+<section class="small" aria-label="Projects">
+  {smallProjects.map((p) => <ProjectCard project={p} />)}
+</section>
+
+<style>
+  .small {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+    max-width: var(--content-width);
+    margin: var(--gap) auto 0;
+    padding: 0 24px;
+  }
+  @media (max-width: 900px) { .small { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .small { grid-template-columns: 1fr; } }
+</style>

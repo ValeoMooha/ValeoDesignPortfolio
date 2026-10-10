@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+  aspect?: string;
+  eager?: boolean;
+}
+const { project, aspect = '4 / 5', eager = false } = Astro.props;
+---
+
+<a class="card" href={project.href} style={`aspect-ratio: ${aspect}`} aria-label={project.title}>
+  <Image
+    src={project.image}
+    alt={project.title}
+    widths={[480, 720, 960]}
+    sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 688px"
+    loading={eager ? 'eager' : 'lazy'}
+  />
+</a>
+
+<style>
+  .card {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    transition: transform 0.25s ease;
+  }
+  .card :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (hover: hover) {
+    .card:hover { transform: scale(1.015); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
