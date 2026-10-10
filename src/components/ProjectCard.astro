@@ -18,37 +18,58 @@ const { project, aspect = '4 / 5', eager = false, parallax = false, revealIndex 
   style={`aspect-ratio: ${aspect}; --reveal-i: ${revealIndex}`}
   data-reveal
 >
-  <div class="media">
-    <Image
-      src={project.image}
-      alt=""
-      widths={[480, 720, 960]}
-      sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 688px"
-      loading={eager ? 'eager' : 'lazy'}
-    />
-  </div>
-  <span class="glow" aria-hidden="true"></span>
-  <span class="label">
-    <span class="title">{project.title}</span>
-    <span class="category">{project.category}</span>
+  <span class="frame">
+    <span class="media">
+      <Image
+        src={project.image}
+        alt=""
+        widths={[480, 720, 960]}
+        sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 688px"
+        loading={eager ? 'eager' : 'lazy'}
+      />
+    </span>
+    <span class="glow" aria-hidden="true"></span>
+    <span class="ring" aria-hidden="true"></span>
+    <span class="label">
+      <span class="title">{project.title}</span>
+      <span class="category">{project.category}</span>
+    </span>
+    <span class="chip" aria-hidden="true">View case <span>→</span></span>
   </span>
 </a>
 
 <style>
+  /*
+    Hover effects are prototyped side by side; the active one is picked by
+    data-card on <html>: zoom | tilt | chip | ring | unveil.
+  */
   .card {
     display: block;
     position: relative;
+    perspective: 900px;
+  }
+  .frame {
+    position: absolute;
+    inset: 0;
     overflow: hidden;
     border-radius: var(--radius-card);
+    background: var(--card-c, var(--bw-15));
     isolation: isolate;
     /* Safari: keep rounded corners while children transform */
     -webkit-mask-image: -webkit-radial-gradient(white, black);
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform var(--dur) var(--ease-out);
   }
 
   .media {
     position: absolute;
     inset: 0;
-    transition: transform var(--dur-slow) var(--ease-out);
+    overflow: hidden;
+    transition:
+      transform var(--dur-slow) var(--ease-out),
+      inset var(--dur-slow) var(--ease-out),
+      border-radius var(--dur-slow) var(--ease-out),
+      filter var(--dur) var(--ease-out);
   }
   .media :global(img) {
     display: block;
@@ -77,9 +98,28 @@ const { project, aspect = '4 / 5', eager = false, parallax = false, revealIndex 
     opacity: 0;
     background: radial-gradient(
       420px circle at var(--mx, 50%) var(--my, 50%),
-      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, var(--glow-a, 0.1)),
       transparent 60%
     );
+    transition: opacity var(--dur) var(--ease-out);
+    pointer-events: none;
+  }
+
+  /* Border that lights up next to the cursor */
+  .ring {
+    position: absolute;
+    inset: 0;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: radial-gradient(
+      260px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.9),
+      transparent 70%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    opacity: 0;
     transition: opacity var(--dur) var(--ease-out);
     pointer-events: none;
   }
@@ -106,10 +146,29 @@ const { project, aspect = '4 / 5', eager = false, parallax = false, revealIndex 
   .title { font-weight: 500; font-size: 15px; line-height: 1.3; color: var(--bw-100); }
   .category { font-size: 13px; line-height: 1.3; color: var(--w-60); }
 
-  @media (hover: hover) {
-    .card:hover .media { transform: scale(1.04); }
-    .card:hover .glow { opacity: 1; }
+  /* Pill that follows the cursor */
+  .chip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 100px;
+    background: var(--bw-100);
+    color: #000;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    translate: calc(var(--mx, 50%) - 50%) calc(var(--my, 50%) - 50%);
+    scale: 0.4;
+    opacity: 0;
+    transition:
+      scale var(--dur) var(--ease-out),
+      opacity var(--dur-fast) var(--ease-out);
   }
+
   .card:hover .label,
   .card:focus-visible .label {
     opacity: 1;
@@ -120,20 +179,68 @@ const { project, aspect = '4 / 5', eager = false, parallax = false, revealIndex 
     .label { opacity: 1; transform: none; }
   }
 
+  @media (hover: hover) {
+    /* 1. Zoom: picture moves closer, soft light */
+    :global(html:not([data-card])) .card:hover .media,
+    :global(html[data-card='zoom']) .card:hover .media { transform: scale(1.04); }
+    :global(html:not([data-card])) .card:hover .glow,
+    :global(html[data-card='zoom']) .card:hover .glow { opacity: 1; }
+
+    /* 2. Tilt: card leans towards the cursor, glare follows */
+    :global(html[data-card='tilt']) .frame { transition-duration: 150ms; }
+    :global(html[data-card='tilt']) .card:hover .media {
+      transform: scale(1.06) translate(calc(var(--px, 0) * -8px), calc(var(--py, 0) * -8px));
+    }
+    :global(html[data-card='tilt']) .card:hover .glow { opacity: 1; --glow-a: 0.22; }
+
+    /* 3. Chip: "View case" pill replaces the cursor */
+    :global(html[data-card='chip']) .card { cursor: none; }
+    :global(html[data-card='chip']) .chip { display: inline-flex; }
+    :global(html[data-card='chip']) .card:hover .chip { scale: 1; opacity: 1; }
+    :global(html[data-card='chip']) .card:hover .media { transform: scale(1.05); filter: brightness(0.85); }
+
+    /* 4. Ring: lit border next to the cursor */
+    :global(html[data-card='ring']) .card:hover .ring { opacity: 1; }
+    :global(html[data-card='ring']) .card:hover .media { transform: scale(1.03); }
+    :global(html[data-card='ring']) .card:hover .glow { opacity: 1; }
+
+    /* 5. Unveil: picture steps back, the project's colour shows around it */
+    :global(html[data-card='unveil']) .card:hover .media {
+      inset: 6%;
+      border-radius: 12px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    }
+    :global(html[data-card='unveil']) .card:hover .label { bottom: 1.5%; left: 6%; background: none; border-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 0; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .media, .label, .glow { transition: none; }
-    .card:hover .media { transform: none; }
+    .frame, .media, .label, .glow, .ring, .chip { transition: none; }
+    .card:hover .media { transform: none !important; }
     .parallax .media :global(img) { animation: none; scale: 1; }
   }
 </style>
 
 <script>
   if (matchMedia('(hover: hover)').matches) {
+    const tilt = () => document.documentElement.dataset.card === 'tilt';
     document.querySelectorAll<HTMLElement>('.card').forEach((card) => {
       card.addEventListener('pointermove', (e) => {
         const r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-        card.style.setProperty('--my', `${e.clientY - r.top}px`);
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        card.style.setProperty('--mx', `${x}px`);
+        card.style.setProperty('--my', `${y}px`);
+        if (tilt()) {
+          const px = (x / r.width) * 2 - 1;
+          const py = (y / r.height) * 2 - 1;
+          card.style.setProperty('--px', px.toFixed(3));
+          card.style.setProperty('--py', py.toFixed(3));
+          card.style.setProperty('--rx', `${(-py * 5).toFixed(2)}deg`);
+          card.style.setProperty('--ry', `${(px * 5).toFixed(2)}deg`);
+        }
+      });
+      card.addEventListener('pointerleave', () => {
+        for (const p of ['--rx', '--ry', '--px', '--py']) card.style.removeProperty(p);
       });
     });
   }

@@ -1,4 +1,5 @@
 ---
+import ContactButton from './ContactButton.astro';
 const links = [
   { label: 'Instagram', href: 'https://www.instagram.com/valeo_mooha/' },
   { label: 'Telegram', href: 'https://t.me/ValeoMooha' },
@@ -12,7 +13,7 @@ const links = [
   <nav class="links" aria-label="Social">
     {links.map((l) => <a href={l.href} rel="noopener" target="_blank">{l.label}</a>)}
   </nav>
-  <a class="contact" href="https://mvaleo.com/contact/">Contact</a>
+  <ContactButton />
 </footer>
 
 <style>
@@ -27,10 +28,4 @@ const links = [
   }
   .links a { transition: color 0.2s; }
   .links a:hover { color: var(--bw-100); }
-  .contact {
-    display: flex; align-items: center; justify-content: center;
-    width: 86px; height: 32px; border-radius: 20px;
-    background: var(--bw-100); color: #000;
-    font-weight: 500; font-size: 15px; line-height: 26px;
-  }
 </style>

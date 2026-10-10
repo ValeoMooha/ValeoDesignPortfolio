@@ -1,0 +1,144 @@
+---
+// Contact button used in the header and the footer. Hover effect variants are
+// picked by data-contact on <html>: magnetic | roll | shine.
+const href = 'https://mvaleo.com/contact/';
+---
+
+<a class="contact-btn" href={href}>
+  <span class="fill" aria-hidden="true"></span>
+  <span class="txt">
+    <span class="t1">Contact</span>
+    <span class="t2" aria-hidden="true">Let’s talk</span>
+  </span>
+  <span class="arrow" aria-hidden="true"><span>→</span></span>
+</a>
+
+<style>
+  .contact-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 86px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 20px;
+    border: 1px solid var(--bw-100);
+    background: var(--bw-100);
+    color: #000;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 26px;
+    overflow: hidden;
+    isolation: isolate;
+    translate: var(--tx, 0) var(--ty, 0);
+    transition:
+      translate var(--dur) var(--ease-out),
+      scale var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .contact-btn:active { scale: 0.95; }
+
+  .txt {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    translate: var(--ttx, 0) var(--tty, 0);
+    transition: translate var(--dur) var(--ease-out);
+  }
+  .t1, .t2 {
+    grid-area: 1 / 1;
+    text-align: center;
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .t2 { transform: translateY(110%); }
+
+  .fill {
+    position: absolute;
+    left: var(--bx, 50%);
+    top: var(--by, 50%);
+    z-index: -1;
+    width: 240px;
+    height: 240px;
+    margin: -120px 0 0 -120px;
+    border-radius: 50%;
+    background: #000;
+    transform: scale(0);
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .arrow {
+    display: grid;
+    grid-template-columns: 0fr;
+    transition: grid-template-columns var(--dur) var(--ease-out);
+  }
+  .arrow > span {
+    overflow: hidden;
+    padding-left: 0;
+    transition: padding-left var(--dur) var(--ease-out);
+  }
+
+  .contact-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%);
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+
+  @media (hover: hover) {
+    /* 2. Roll: dark fill grows from the cursor, the label rolls to "Let's talk" */
+    :global(html[data-contact='roll']) .contact-btn:hover { color: var(--bw-100); }
+    :global(html[data-contact='roll']) .contact-btn:hover .fill { transform: scale(1); }
+    :global(html[data-contact='roll']) .contact-btn:hover .t1 { transform: translateY(-110%); }
+    :global(html[data-contact='roll']) .contact-btn:hover .t2 { transform: none; }
+
+    /* 3. Shine: light sweeps across, soft halo, arrow slides in */
+    :global(html[data-contact='shine']) .contact-btn:hover {
+      box-shadow: 0 0 24px rgba(255, 255, 255, 0.35), 0 0 4px rgba(255, 255, 255, 0.6);
+    }
+    :global(html[data-contact='shine']) .contact-btn:hover::after {
+      transform: translateX(120%);
+      transition: transform 0.9s var(--ease-out);
+    }
+    :global(html[data-contact='shine']) .contact-btn:hover .arrow { grid-template-columns: 1fr; }
+    :global(html[data-contact='shine']) .contact-btn:hover .arrow > span { padding-left: 6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact-btn, .txt, .t1, .t2, .fill, .arrow, .arrow > span { transition: none; }
+  }
+</style>
+
+<script>
+  if (matchMedia('(hover: hover)').matches) {
+    const mode = () => document.documentElement.dataset.contact ?? 'magnetic';
+    document.querySelectorAll<HTMLElement>('.contact-btn').forEach((btn) => {
+      btn.addEventListener('pointerenter', (e) => {
+        // Roll: the fill starts where the cursor came in.
+        const r = btn.getBoundingClientRect();
+        btn.style.setProperty('--bx', `${e.clientX - r.left}px`);
+        btn.style.setProperty('--by', `${e.clientY - r.top}px`);
+      });
+      btn.addEventListener('pointerleave', (e) => {
+        const r = btn.getBoundingClientRect();
+        btn.style.setProperty('--bx', `${e.clientX - r.left}px`);
+        btn.style.setProperty('--by', `${e.clientY - r.top}px`);
+        for (const p of ['--tx', '--ty', '--ttx', '--tty']) btn.style.removeProperty(p);
+      });
+      // 1. Magnetic: the button leans towards the cursor, the label a bit more.
+      btn.addEventListener('pointermove', (e) => {
+        if (mode() !== 'magnetic') return;
+        const r = btn.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        btn.style.setProperty('--tx', `${dx * 0.3}px`);
+        btn.style.setProperty('--ty', `${dy * 0.4}px`);
+        btn.style.setProperty('--ttx', `${dx * 0.15}px`);
+        btn.style.setProperty('--tty', `${dy * 0.2}px`);
+      });
+    });
+  }
+</script>
