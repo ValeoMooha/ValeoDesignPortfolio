@@ -1,16 +1,35 @@
 ---
 // Contact button used in the header and the footer. Hover effect variants are
-// picked by data-contact on <html>: magnetic | roll | shine.
+// picked by data-contact on <html>: constellation | orbit | glass | decode.
 const href = 'https://mvaleo.com/contact/';
+
+// Constellation: stars around the button (in px from its centre) and the
+// lines between them. Fixed positions so the shape is the same everywhere.
+const stars = [
+  { x: -62, y: -20, r: 1.6 },
+  { x: -48, y: 22, r: 1.2 },
+  { x: -20, y: -30, r: 1.1 },
+  { x: 24, y: 30, r: 1.4 },
+  { x: 54, y: -26, r: 1.8 },
+  { x: 66, y: 12, r: 1.2 },
+];
+const lines = [
+  [0, 2], [0, 1], [2, 4], [4, 5], [5, 3], [3, 1],
+];
 ---
 
-<a class="contact-btn" href={href}>
-  <span class="fill" aria-hidden="true"></span>
-  <span class="txt">
-    <span class="t1">Contact</span>
-    <span class="t2" aria-hidden="true">Let’s talk</span>
-  </span>
-  <span class="arrow" aria-hidden="true"><span>→</span></span>
+<a class="contact-btn" href={href} aria-label="Contact">
+  <svg class="constellation" viewBox="-80 -40 160 80" aria-hidden="true">
+    {lines.map(([a, b], i) => (
+      <line
+        x1={stars[a].x} y1={stars[a].y} x2={stars[b].x} y2={stars[b].y}
+        pathLength="1" style={`--i: ${i}`}
+      />
+    ))}
+    {stars.map((s, i) => <circle cx={s.x} cy={s.y} r={s.r} style={`--i: ${i}`} />)}
+  </svg>
+  <span class="orbit" aria-hidden="true"></span>
+  <span class="label" data-from="Contact" data-to="Let’s talk">Contact</span>
 </a>
 
 <style>
@@ -29,115 +48,149 @@ const href = 'https://mvaleo.com/contact/';
     font-weight: 500;
     font-size: 15px;
     line-height: 26px;
-    overflow: hidden;
-    isolation: isolate;
-    translate: var(--tx, 0) var(--ty, 0);
+    white-space: nowrap;
     transition:
-      translate var(--dur) var(--ease-out),
-      scale var(--dur-fast) var(--ease-out),
+      background-color var(--dur) var(--ease-out),
+      color var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out),
       box-shadow var(--dur) var(--ease-out),
-      color var(--dur-fast) var(--ease-out);
+      scale var(--dur-fast) var(--ease-out);
   }
   .contact-btn:active { scale: 0.95; }
+  .label { position: relative; }
 
-  .txt {
-    position: relative;
-    display: grid;
-    overflow: hidden;
-    translate: var(--ttx, 0) var(--tty, 0);
-    transition: translate var(--dur) var(--ease-out);
-  }
-  .t1, .t2 {
-    grid-area: 1 / 1;
-    text-align: center;
-    transition: transform var(--dur) var(--ease-out);
-  }
-  .t2 { transform: translateY(110%); }
+  .constellation,
+  .orbit { display: none; pointer-events: none; }
 
-  .fill {
+  /* A. Constellation: stars light up around the button and get connected */
+  :global(html[data-contact='constellation']) .constellation {
+    display: block;
     position: absolute;
-    left: var(--bx, 50%);
-    top: var(--by, 50%);
-    z-index: -1;
-    width: 240px;
-    height: 240px;
-    margin: -120px 0 0 -120px;
-    border-radius: 50%;
-    background: #000;
-    transform: scale(0);
-    transition: transform var(--dur) var(--ease-out);
+    left: 50%;
+    top: 50%;
+    width: 160px;
+    height: 80px;
+    translate: -50% -50%;
+    overflow: visible;
   }
+  .constellation circle {
+    fill: var(--bw-100);
+    opacity: 0;
+    scale: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
+    transition:
+      opacity 0.4s var(--ease-out),
+      scale 0.5s var(--ease-out);
+    transition-delay: calc(var(--i) * 45ms);
+  }
+  .constellation line {
+    stroke: rgba(255, 255, 255, 0.35);
+    stroke-width: 0.6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.6s var(--ease-out);
+    transition-delay: calc(150ms + var(--i) * 60ms);
+  }
+  .contact-btn:hover .constellation circle { opacity: 1; scale: 1; }
+  .contact-btn:hover .constellation line { stroke-dashoffset: 0; }
 
-  .arrow {
-    display: grid;
-    grid-template-columns: 0fr;
-    transition: grid-template-columns var(--dur) var(--ease-out);
+  /* B. Orbit: a light runs around the outline with a soft tail */
+  @property --orbit-a {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
   }
-  .arrow > span {
-    overflow: hidden;
-    padding-left: 0;
-    transition: padding-left var(--dur) var(--ease-out);
-  }
-
-  .contact-btn::after {
-    content: '';
+  :global(html[data-contact='orbit']) .orbit {
+    display: block;
     position: absolute;
-    inset: 0;
-    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%);
-    transform: translateX(-120%);
-    pointer-events: none;
+    inset: -5px;
+    border-radius: 25px;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--orbit-a),
+      transparent 0 55%,
+      rgba(255, 255, 255, 0.25) 75%,
+      rgba(255, 255, 255, 1) 97%,
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease-out);
+    animation: orbit 2.2s linear infinite;
+    animation-play-state: paused;
+  }
+  .contact-btn:hover .orbit { opacity: 1; animation-play-state: running; }
+  @keyframes orbit { to { --orbit-a: 360deg; } }
+
+  /* C. Liquid glass: see-through glass that fills with white on hover */
+  :global(html[data-contact='glass']) .contact-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: var(--bw-100);
+    -webkit-backdrop-filter: blur(12px) saturate(1.8);
+    backdrop-filter: blur(12px) saturate(1.8);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+      0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+  :global(html[data-contact='glass']) .contact-btn:hover {
+    background: var(--bw-100);
+    border-color: var(--bw-100);
+    color: #000;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 0 24px rgba(255, 255, 255, 0.25);
   }
 
-  @media (hover: hover) {
-    /* 2. Roll: dark fill grows from the cursor, the label rolls to "Let's talk" */
-    :global(html[data-contact='roll']) .contact-btn:hover { color: var(--bw-100); }
-    :global(html[data-contact='roll']) .contact-btn:hover .fill { transform: scale(1); }
-    :global(html[data-contact='roll']) .contact-btn:hover .t1 { transform: translateY(-110%); }
-    :global(html[data-contact='roll']) .contact-btn:hover .t2 { transform: none; }
-
-    /* 3. Shine: light sweeps across, soft halo, arrow slides in */
-    :global(html[data-contact='shine']) .contact-btn:hover {
-      box-shadow: 0 0 24px rgba(255, 255, 255, 0.35), 0 0 4px rgba(255, 255, 255, 0.6);
-    }
-    :global(html[data-contact='shine']) .contact-btn:hover::after {
-      transform: translateX(120%);
-      transition: transform 0.9s var(--ease-out);
-    }
-    :global(html[data-contact='shine']) .contact-btn:hover .arrow { grid-template-columns: 1fr; }
-    :global(html[data-contact='shine']) .contact-btn:hover .arrow > span { padding-left: 6px; }
-  }
+  /* D. Decode: fixed width so the label does not jump while it scrambles */
+  :global(html[data-contact='decode']) .contact-btn { min-width: 104px; }
+  :global(html[data-contact='decode']) .label { font-variant-numeric: tabular-nums; }
 
   @media (prefers-reduced-motion: reduce) {
-    .contact-btn, .txt, .t1, .t2, .fill, .arrow, .arrow > span { transition: none; }
+    .constellation circle, .constellation line, .orbit { transition: none; animation: none; }
   }
 </style>
 
 <script>
+  // D. Decode: letters cycle through random symbols, then settle.
+  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*+=<>/\\';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function scramble(el: HTMLElement, to: string) {
+    const from = el.textContent ?? '';
+    const length = Math.max(from.length, to.length);
+    const start = performance.now();
+    const duration = 450;
+    cancelAnimationFrame(Number(el.dataset.raf));
+    const frame = (now: number) => {
+      const k = Math.min((now - start) / duration, 1);
+      let out = '';
+      for (let i = 0; i < length; i++) {
+        // Letters lock in from left to right.
+        if (k >= (i + 1) / length) out += to[i] ?? '';
+        else if (k > i / length / 2) out += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        else out += from[i] ?? '';
+      }
+      el.textContent = out.trimEnd();
+      if (k < 1) el.dataset.raf = String(requestAnimationFrame(frame));
+    };
+    el.dataset.raf = String(requestAnimationFrame(frame));
+  }
+
   if (matchMedia('(hover: hover)').matches) {
-    const mode = () => document.documentElement.dataset.contact ?? 'magnetic';
     document.querySelectorAll<HTMLElement>('.contact-btn').forEach((btn) => {
-      btn.addEventListener('pointerenter', (e) => {
-        // Roll: the fill starts where the cursor came in.
-        const r = btn.getBoundingClientRect();
-        btn.style.setProperty('--bx', `${e.clientX - r.left}px`);
-        btn.style.setProperty('--by', `${e.clientY - r.top}px`);
-      });
-      btn.addEventListener('pointerleave', (e) => {
-        const r = btn.getBoundingClientRect();
-        btn.style.setProperty('--bx', `${e.clientX - r.left}px`);
-        btn.style.setProperty('--by', `${e.clientY - r.top}px`);
-        for (const p of ['--tx', '--ty', '--ttx', '--tty']) btn.style.removeProperty(p);
-      });
-      // 1. Magnetic: the button leans towards the cursor, the label a bit more.
-      btn.addEventListener('pointermove', (e) => {
-        if (mode() !== 'magnetic') return;
-        const r = btn.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2);
-        const dy = e.clientY - (r.top + r.height / 2);
-        btn.style.setProperty('--tx', `${dx * 0.3}px`);
-        btn.style.setProperty('--ty', `${dy * 0.4}px`);
-        btn.style.setProperty('--ttx', `${dx * 0.15}px`);
-        btn.style.setProperty('--tty', `${dy * 0.2}px`);
+      const label = btn.querySelector<HTMLElement>('.label')!;
+      const decode = () => document.documentElement.dataset.contact === 'decode' && !reduce;
+      btn.addEventListener('pointerenter', () => decode() && scramble(label, label.dataset.to!));
+      btn.addEventListener('pointerleave', () => {
+        if (decode()) scramble(label, label.dataset.from!);
+        else label.textContent = label.dataset.from!;
       });
     });
   }
