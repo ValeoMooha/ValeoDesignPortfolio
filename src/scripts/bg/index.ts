@@ -33,7 +33,7 @@ function colorOf(card: HTMLElement) {
   return cardColor.get(card);
 }
 
-const cards = [...document.querySelectorAll<HTMLElement>('.card, [data-glow]')];
+const cards = [...document.querySelectorAll<HTMLElement>('.card')];
 
 /* ---------- D. Light behind the hovered card ---------- */
 

@@ -1,5 +1,5 @@
 ---
-// Variant 3 — Shelf: plugins as App Store style cards with big glossy icons,
+// Shelf: plugins as App Store style cards with big glossy icons,
 // templates and systems on a horizontal shelf below.
 import { Image } from 'astro:assets';
 import { tools } from '../../data/tools';
@@ -14,14 +14,14 @@ const files = tools.filter((t) => t.type !== 'Plugin');
     {plugins.map((tool, i) => (
       <article class="app" style={`--a: ${tool.accent}; --b: ${tool.accent2}; --reveal-i: ${i}`} data-reveal>
         <div class="app-head">
-          {tool.icon && <Image class="app-icon" src={tool.icon} alt="" width={96} height={96} />}
+          {tool.icon && <Image class="app-icon" src={tool.icon} alt="" width={48} height={48} />}
           <div>
             <h3>{tool.title}{tool.emoji && ` ${tool.emoji}`}</h3>
             <p>{tool.description}</p>
             <a class="get" href={tool.href} target="_blank" rel="noopener">Get</a>
           </div>
         </div>
-        <a class="screen" href={tool.href} target="_blank" rel="noopener" tabindex="-1" data-glow>
+        <a class="screen" href={tool.href} target="_blank" rel="noopener" tabindex="-1">
           <Image src={tool.cover} alt="" widths={[400, 800]} sizes="(max-width: 800px) 100vw, 560px" />
         </a>
       </article>
@@ -31,7 +31,7 @@ const files = tools.filter((t) => t.type !== 'Plugin');
   <h2 class="section">Templates &amp; systems</h2>
   <div class="row" tabindex="0" aria-label="Templates and systems">
     {files.map((tool, i) => (
-      <a class="file" href={tool.href} target="_blank" rel="noopener" style={`--a: ${tool.accent}; --b: ${tool.accent2}; --reveal-i: ${i}`} data-reveal data-glow>
+      <a class="file" href={tool.href} target="_blank" rel="noopener" style={`--a: ${tool.accent}; --b: ${tool.accent2}; --reveal-i: ${i}`} data-reveal>
         <span class="file-cover">
           <Image src={tool.cover} alt="" widths={[400, 800]} sizes="420px" />
         </span>
@@ -66,9 +66,9 @@ const files = tools.filter((t) => t.type !== 'Plugin');
   .app-head { display: flex; gap: 20px; align-items: flex-start; }
   .app-head :global(.app-icon) {
     flex: none;
-    border-radius: 22px;
+    border-radius: 11px;
     box-shadow:
-      0 12px 32px color-mix(in srgb, var(--a) 50%, transparent),
+      0 6px 16px color-mix(in srgb, var(--a) 50%, transparent),
       inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     transition: transform var(--dur) var(--ease-out);
   }
@@ -119,15 +119,24 @@ const files = tools.filter((t) => t.type !== 'Plugin');
     scroll-snap-align: start;
   }
   .file-cover {
+    position: relative;
     display: block;
     margin-bottom: 12px;
     border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
-    transition: box-shadow var(--dur) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  /* Thin edge so dark covers do not melt into the background */
+  .file-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: inherit;
+    pointer-events: none;
   }
   .file-cover :global(img) { display: block; width: 100%; height: auto; transition: transform var(--dur-slow) var(--ease-out); }
-  .file:hover .file-cover { transform: translateY(-4px); box-shadow: 0 16px 50px color-mix(in srgb, var(--a) 40%, transparent); }
+  .file:hover .file-cover { transform: translateY(-4px); }
   .file:hover .file-cover :global(img) { transform: scale(1.04); }
   .file-type { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: color-mix(in srgb, var(--a) 60%, white); }
   .file-title { font-size: 18px; font-weight: 700; }
