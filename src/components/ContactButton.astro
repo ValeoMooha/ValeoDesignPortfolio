@@ -1,106 +1,28 @@
 ---
 // Contact button used in the header and the footer. On hover a constellation
-// lights up around it. Shape variants are picked by data-shape on <html>.
+// lights up around it.
 const href = 'https://mvaleo.com/contact/';
 
-type Star = { x: number; y: number; r: number };
-type Shape = { id: string; stars: Star[]; lines: [number, number][]; twinkle?: boolean };
-
-// Star positions are in px from the button centre. The button is about
-// 92 x 32, so stars keep clear of |x| < 48, |y| < 18.
-const loop: Shape = {
-  id: 'loop',
-  stars: [
-    { x: -62, y: -20, r: 1.6 }, { x: -48, y: 22, r: 1.2 }, { x: -20, y: -30, r: 1.1 },
-    { x: 24, y: 30, r: 1.4 }, { x: 54, y: -26, r: 1.8 }, { x: 66, y: 12, r: 1.2 },
-  ],
-  lines: [[0, 2], [0, 1], [2, 4], [4, 5], [5, 3], [3, 1]],
-};
-
-const dipper: Shape = {
-  id: 'dipper',
-  stars: [
-    { x: -86, y: 14, r: 1.3 }, { x: -68, y: -4, r: 1.5 }, { x: -50, y: -24, r: 1.4 },
-    { x: 50, y: -28, r: 1.7 }, { x: 78, y: -8, r: 1.5 }, { x: 68, y: 26, r: 1.6 },
-    { x: 50, y: 22, r: 1.2 },
-  ],
-  lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]],
-};
-
-const frame: Shape = {
-  id: 'frame',
-  stars: [
-    { x: -62, y: -28, r: 1.7 }, { x: 64, y: -30, r: 1.4 }, { x: -78, y: 0, r: 1.2 },
-    { x: 80, y: -2, r: 1.6 }, { x: -56, y: 26, r: 1.4 }, { x: 60, y: 28, r: 1.8 },
-  ],
-  lines: [[0, 1], [1, 3], [3, 5], [5, 4], [4, 2], [2, 0]],
-};
-
-// Burst: rays from the edge of the button out to each star.
-const burstStars: Star[] = Array.from({ length: 9 }, (_, i) => {
-  const a = (i / 9) * Math.PI * 2 + 0.3;
-  const d = i % 2 ? 1 : 0.82;
-  return { x: Math.cos(a) * 82 * d, y: Math.sin(a) * 36 * d, r: i % 3 ? 1.2 : 1.7 };
-});
-const burst: Shape = { id: 'burst', stars: burstStars, lines: [] };
-
-// Ring: stars on an orbit around the button, joined in a closed loop.
-const ringStars: Star[] = Array.from({ length: 10 }, (_, i) => {
-  const a = (i / 10) * Math.PI * 2;
-  const wobble = [1, 0.93, 1.05, 0.97, 1.02][i % 5];
-  return { x: Math.cos(a) * 74 * wobble, y: Math.sin(a) * 31 * wobble, r: i % 3 ? 1.1 : 1.6 };
-});
-const ring: Shape = {
-  id: 'ring',
-  stars: ringStars,
-  lines: ringStars.map((_, i) => [i, (i + 1) % ringStars.length] as [number, number]),
-};
-
-// Swarm: no lines, stars keep twinkling while hovered.
-const swarm: Shape = {
-  id: 'swarm',
-  twinkle: true,
-  stars: [
-    { x: -70, y: -24, r: 1.5 }, { x: -84, y: 6, r: 1 }, { x: -58, y: 26, r: 1.3 },
-    { x: -26, y: -32, r: 1 }, { x: 8, y: -30, r: 1.6 }, { x: 36, y: -28, r: 1.1 },
-    { x: 66, y: -18, r: 1.4 }, { x: 86, y: 8, r: 1 }, { x: 58, y: 28, r: 1.6 },
-    { x: 20, y: 31, r: 1.1 }, { x: -16, y: 30, r: 1.4 },
-  ],
-  lines: [],
-};
-
-const shapes = [loop, dipper, frame, burst, ring, swarm];
-
-// Rays for the burst start just outside the button outline.
-function rayStart(s: Star) {
-  const k = Math.min(52 / Math.abs(s.x || 1e-6), 21 / Math.abs(s.y || 1e-6));
-  return { x: s.x * k, y: s.y * k };
-}
+// Stars of the Big Dipper around the button, in px from its centre.
+// The button is about 92 x 32, so stars keep clear of |x| < 48, |y| < 18.
+const stars = [
+  { x: -86, y: 14, r: 1.3 }, { x: -68, y: -4, r: 1.5 }, { x: -50, y: -24, r: 1.4 },
+  { x: 50, y: -28, r: 1.7 }, { x: 78, y: -8, r: 1.5 }, { x: 68, y: 26, r: 1.6 },
+  { x: 50, y: 22, r: 1.2 },
+];
+const lines = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]];
 ---
 
 <span class="contact">
-  {shapes.map((shape) => (
-    <svg
-      class:list={['constellation', { twinkle: shape.twinkle }]}
-      data-shape={shape.id}
-      viewBox="-100 -45 200 90"
-      aria-hidden="true"
-    >
-      {shape.lines.map(([a, b], i) => (
-        <line
-          x1={shape.stars[a].x} y1={shape.stars[a].y}
-          x2={shape.stars[b].x} y2={shape.stars[b].y}
-          pathLength="1" style={`--i: ${i}`}
-        />
-      ))}
-      {shape.id === 'burst' &&
-        shape.stars.map((s, i) => {
-          const p = rayStart(s);
-          return <line x1={p.x} y1={p.y} x2={s.x} y2={s.y} pathLength="1" style={`--i: ${i}`} />;
-        })}
-      {shape.stars.map((s, i) => <circle cx={s.x} cy={s.y} r={s.r} style={`--i: ${i}`} />)}
-    </svg>
-  ))}
+  <svg class="constellation" viewBox="-100 -45 200 90" aria-hidden="true">
+    {lines.map(([a, b], i) => (
+      <line
+        x1={stars[a].x} y1={stars[a].y} x2={stars[b].x} y2={stars[b].y}
+        pathLength="1" style={`--i: ${i}`}
+      />
+    ))}
+    {stars.map((s, i) => <circle cx={s.x} cy={s.y} r={s.r} style={`--i: ${i}`} />)}
+  </svg>
   <a class="contact-btn" href={href}>Contact</a>
 </span>
 
@@ -141,7 +63,6 @@ function rayStart(s: Star) {
   }
 
   .constellation {
-    display: none;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -152,16 +73,6 @@ function rayStart(s: Star) {
     overflow: visible;
     pointer-events: none;
   }
-  :global(html:not([data-shape])) .constellation[data-shape='loop'],
-  :global(html[data-shape='loop']) .constellation[data-shape='loop'],
-  :global(html[data-shape='dipper']) .constellation[data-shape='dipper'],
-  :global(html[data-shape='frame']) .constellation[data-shape='frame'],
-  :global(html[data-shape='burst']) .constellation[data-shape='burst'],
-  :global(html[data-shape='ring']) .constellation[data-shape='ring'],
-  :global(html[data-shape='swarm']) .constellation[data-shape='swarm'] {
-    display: block;
-  }
-
   /* Stars pop in one after another, then the lines draw between them. */
   .constellation circle {
     fill: var(--bw-100);
@@ -186,18 +97,7 @@ function rayStart(s: Star) {
   .contact:hover .constellation circle { opacity: 1; scale: 1; }
   .contact:hover .constellation line { stroke-dashoffset: 0; }
 
-  .twinkle circle { animation: twinkle 1.6s ease-in-out infinite paused; }
-  .contact:hover .twinkle circle {
-    animation-play-state: running;
-    animation-delay: calc(var(--i) * -0.37s);
-  }
-  @keyframes twinkle {
-    0%, 100% { fill-opacity: 1; }
-    50% { fill-opacity: 0.25; }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .contact-btn, .constellation circle, .constellation line { transition: none; }
-    .twinkle circle { animation: none; }
   }
 </style>

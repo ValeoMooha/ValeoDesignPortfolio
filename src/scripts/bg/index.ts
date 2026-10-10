@@ -28,11 +28,7 @@ function sample(img: HTMLImageElement): [number, number, number] {
 function colorOf(card: HTMLElement) {
   if (!cardColor.has(card)) {
     const img = card.querySelector('img');
-    if (img?.complete && img.naturalWidth) {
-      const c = sample(img);
-      cardColor.set(card, c);
-      card.style.setProperty('--card-c', `rgb(${c.map((v) => Math.round(v * 255)).join(' ')})`);
-    }
+    if (img?.complete && img.naturalWidth) cardColor.set(card, sample(img));
   }
   return cardColor.get(card);
 }
