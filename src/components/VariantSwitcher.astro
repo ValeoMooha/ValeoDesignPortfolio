@@ -2,13 +2,15 @@
 // Prototype only: compare hover effects live. Remove once a variant is chosen.
 const groups = [
   {
-    key: 'contact',
-    title: 'Contact',
+    key: 'shape',
+    title: 'Созвездие',
     options: [
-      { id: 'constellation', label: 'A Созвездие' },
-      { id: 'orbit', label: 'B Орбита' },
-      { id: 'glass', label: 'C Стекло' },
-      { id: 'decode', label: 'D Расшифровка' },
+      { id: 'loop', label: '1 Петля' },
+      { id: 'dipper', label: '2 Ковш' },
+      { id: 'frame', label: '3 Рамка' },
+      { id: 'burst', label: '4 Вспышка' },
+      { id: 'ring', label: '5 Кольцо' },
+      { id: 'swarm', label: '6 Рой' },
     ],
   },
 ];
@@ -26,6 +28,8 @@ const groups = [
 </div>
 
 <style>
+  /* Keep the footer clear of the switcher while prototyping */
+  :global(body) { padding-bottom: 64px; }
   .switcher {
     position: fixed;
     left: 50%;
