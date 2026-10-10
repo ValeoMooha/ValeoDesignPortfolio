@@ -19,7 +19,7 @@ html { background: var(--bw-0); }
 
 body {
   margin: 0;
-  background: var(--bw-0);
+  background: transparent; /* the animated background sits behind body */
   color: var(--bw-100);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
