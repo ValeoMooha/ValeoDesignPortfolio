@@ -30,10 +30,10 @@ const files = tools.filter((t) => t.type !== 'Plugin');
 
   <h2 class="section">Templates &amp; systems</h2>
   <div class="row" tabindex="0" aria-label="Templates and systems">
-    {files.map((tool, i) => (
-      <a class="file" href={tool.href} target="_blank" rel="noopener" style={`--a: ${tool.accent}; --b: ${tool.accent2}; --reveal-i: ${i}`} data-reveal>
+    {files.map((tool) => (
+      <a class="file" href={tool.href} target="_blank" rel="noopener" style={`--a: ${tool.accent}; --b: ${tool.accent2}`}>
         <span class="file-cover">
-          <Image src={tool.cover} alt="" widths={[400, 800]} sizes="420px" />
+          <Image src={tool.cover} alt="" widths={[400, 800]} sizes="420px" loading="eager" />
         </span>
         <span class="file-type">{tool.type}</span>
         <span class="file-title">{tool.title}{tool.emoji && ` ${tool.emoji}`}</span>
