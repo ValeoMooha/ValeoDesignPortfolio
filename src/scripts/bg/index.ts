@@ -1,16 +1,6 @@
 // Runs the animated page background and the colour light behind project cards.
-import type { FrameState, Scene, SceneFactory } from './gl';
+import type { FrameState, Scene } from './gl';
 import { createStarfield } from './starfield';
-import { createNebula } from './nebula';
-import { createGalaxy } from './galaxy';
-
-export type SceneId = 'a' | 'b' | 'c';
-
-const factories: Record<SceneId, SceneFactory> = {
-  a: createStarfield,
-  b: createNebula,
-  c: createGalaxy,
-};
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const lite = matchMedia('(max-width: 700px)').matches || (navigator.hardwareConcurrency ?? 8) <= 4;
@@ -48,7 +38,6 @@ const cards = [...document.querySelectorAll<HTMLElement>('.card')];
 /* ---------- D. Light behind the hovered card ---------- */
 
 const glow = document.querySelector<HTMLElement>('.card-glow')!;
-let glowOn = true;
 let hovered: HTMLElement | null = null;
 
 function placeGlow() {
@@ -63,7 +52,7 @@ if (matchMedia('(hover: hover)').matches) {
   for (const card of cards) {
     card.addEventListener('pointerenter', () => {
       const c = colorOf(card);
-      if (!c || !glowOn) return;
+      if (!c) return;
       hovered = card;
       glow.style.setProperty('--glow', `rgb(${c.map((v) => Math.round(v * 255)).join(' ')})`);
       placeGlow();
@@ -150,7 +139,7 @@ function tick(now: number) {
   if (!reducedMotion) raf = requestAnimationFrame(tick);
 }
 
-export function setScene(id: SceneId) {
+export function startBackground() {
   cancelAnimationFrame(raf);
   scene?.dispose();
   canvas?.remove();
@@ -159,7 +148,7 @@ export function setScene(id: SceneId) {
   gl = canvas.getContext('webgl2', { antialias: false, alpha: false, powerPreference: 'high-performance' });
   if (!gl) { host.classList.add('off'); return; }
   try {
-    scene = factories[id](gl, { lite });
+    scene = createStarfield(gl, { lite });
   } catch (err) {
     console.error(err);
     host.classList.add('off');
@@ -168,11 +157,6 @@ export function setScene(id: SceneId) {
   start = 0;
   resize();
   raf = requestAnimationFrame(tick);
-}
-
-export function setGlow(on: boolean) {
-  glowOn = on;
-  if (!on) glow.classList.remove('on');
 }
 
 addEventListener('resize', resize);

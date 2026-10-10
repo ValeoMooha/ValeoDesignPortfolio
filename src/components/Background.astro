@@ -1,24 +1,5 @@
----
-// Prototype switcher: compare background variants live on the page.
-const scenes = [
-  { id: 'a', label: 'Космос' },
-  { id: 'b', label: 'Туманность' },
-  { id: 'c', label: 'Галактика' },
-];
----
-
 <div class="bg" aria-hidden="true"></div>
 <div class="card-glow" aria-hidden="true"></div>
-
-<div class="switcher" role="group" aria-label="Background prototype">
-  {scenes.map((s) => (
-    <button type="button" data-scene={s.id}>
-      <b>{s.id.toUpperCase()}</b> {s.label}
-    </button>
-  ))}
-  <span class="sep"></span>
-  <button type="button" data-glow aria-pressed="true"><b>D</b> Свет</button>
-</div>
 
 <style>
   .bg {
@@ -47,79 +28,10 @@ const scenes = [
     transition: opacity 0.8s var(--ease-out);
   }
   .card-glow:global(.on) { opacity: 0.55; }
-
-  .switcher {
-    position: fixed;
-    left: 50%;
-    bottom: 20px;
-    translate: -50% 0;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px;
-    border-radius: 100px;
-    background: rgba(20, 20, 20, 0.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
-    backdrop-filter: blur(20px) saturate(1.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    font-family: var(--font);
-  }
-  .switcher button {
-    border: 0;
-    padding: 6px 12px;
-    border-radius: 100px;
-    background: transparent;
-    color: var(--w-60);
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  .switcher button:hover { color: var(--bw-100); }
-  .switcher button[aria-pressed='true'] { background: rgba(255, 255, 255, 0.14); color: var(--bw-100); }
-  .switcher b { font-weight: 700; }
-  .sep { width: 1px; height: 18px; background: rgba(255, 255, 255, 0.12); margin: 0 2px; }
-  @media (max-width: 600px) {
-    .switcher button { padding: 6px 9px; font-size: 12px; }
-  }
 </style>
 
 <script>
-  import { setGlow, setScene, type SceneId } from '../scripts/bg/index';
+  import { startBackground } from '../scripts/bg/index';
 
-  const params = new URLSearchParams(location.search);
-  let scene = (params.get('bg') as SceneId) || 'b';
-  if (!['a', 'b', 'c'].includes(scene)) scene = 'b';
-  let glow = params.get('glow') !== '0';
-
-  const sceneButtons = document.querySelectorAll<HTMLButtonElement>('[data-scene]');
-  const glowButton = document.querySelector<HTMLButtonElement>('[data-glow]')!;
-
-  function sync() {
-    sceneButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.scene === scene)));
-    glowButton.setAttribute('aria-pressed', String(glow));
-    const url = new URL(location.href);
-    url.searchParams.set('bg', scene);
-    url.searchParams.set('glow', glow ? '1' : '0');
-    history.replaceState(null, '', url);
-  }
-
-  sceneButtons.forEach((b) =>
-    b.addEventListener('click', () => {
-      scene = b.dataset.scene as SceneId;
-      setScene(scene);
-      sync();
-    }),
-  );
-  glowButton.addEventListener('click', () => {
-    glow = !glow;
-    setGlow(glow);
-    sync();
-  });
-
-  setScene(scene);
-  setGlow(glow);
-  sync();
+  startBackground();
 </script>

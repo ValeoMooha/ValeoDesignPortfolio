@@ -1,4 +1,4 @@
-// A. Deep space: stars at different depths, slow flight forward on scroll,
+// Deep space: stars at different depths, slow flight forward on scroll,
 // parallax from the cursor and a rare shooting star.
 import { buffer, program, rng, type SceneFactory } from './gl';
 
@@ -38,7 +38,7 @@ void main() {
   core = core * core + smoothstep(0.12, 0.0, d);   // soft halo + bright centre
   vec3 col = mix(vec3(0.85, 0.9, 1.0), vec3(1.0, 0.88, 0.75), vTint);
   col = mix(col, uColor, 0.15);
-  o = vec4(col, core * vAlpha);
+  o = vec4(col, core * vAlpha * 0.7);
 }`;
 
 const TRAIL_VS = /* glsl */ `#version 300 es
@@ -53,7 +53,7 @@ out vec4 o;
 void main() { o = vec4(1.0, 1.0, 1.0, vA * 0.8); }`;
 
 export const createStarfield: SceneFactory = (gl, { lite }) => {
-  const count = lite ? 2500 : 7000;
+  const count = lite ? 1250 : 3500;
   const rand = rng(7);
   const pos = new Float32Array(count * 3);
   const meta = new Float32Array(count * 3);
@@ -93,7 +93,7 @@ export const createStarfield: SceneFactory = (gl, { lite }) => {
       // Constant slow drift, plus a push forward when the page scrolls.
       const scrollDelta = s.scroll - lastScroll;
       lastScroll = s.scroll;
-      travel += s.dt * 0.012 + Math.max(-0.02, Math.min(0.02, scrollDelta * 0.00012));
+      travel += s.dt * 0.006 + Math.max(-0.01, Math.min(0.01, scrollDelta * 0.00006));
 
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
