@@ -1,0 +1,171 @@
+---
+// Variant 5 — Carousel: tall cards on a horizontal track, each washed in its
+// cover's colours. The card in the middle is larger and brighter.
+import { Image } from 'astro:assets';
+import { tools } from '../../data/tools';
+---
+
+<section class="carousel">
+  <div class="track" tabindex="0" aria-label="Tools">
+    {tools.map((tool) => (
+      <a class="slide" href={tool.href} target="_blank" rel="noopener" style={`--a: ${tool.accent}; --b: ${tool.accent2}`} data-glow>
+        <span class="bg" aria-hidden="true">
+          <Image src={tool.cover} alt="" width={400} />
+        </span>
+        <span class="top">
+          {tool.icon ? <Image class="icon" src={tool.icon} alt="" width={48} height={48} /> : <span class="dot" />}
+          <span class="type">{tool.type}</span>
+        </span>
+        <span class="shot">
+          <Image src={tool.cover} alt="" widths={[400, 800]} sizes="420px" />
+        </span>
+        <span class="title">{tool.title}{tool.emoji && ` ${tool.emoji}`}</span>
+        <span class="desc">{tool.description}</span>
+        <span class="cta">Open in Figma ↗</span>
+      </a>
+    ))}
+  </div>
+  <div class="controls">
+    <button type="button" data-dir="-1" aria-label="Previous">←</button>
+    <button type="button" data-dir="1" aria-label="Next">→</button>
+  </div>
+</section>
+
+<style>
+  .carousel { margin-top: clamp(48px, 6vw, 88px); }
+  .track {
+    position: relative;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(440px, 82vw);
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 40px calc(50vw - min(220px, 41vw));
+    scrollbar-width: none;
+  }
+  .track::-webkit-scrollbar { display: none; }
+
+  .slide {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 560px;
+    padding: 28px;
+    border-radius: 32px;
+    overflow: hidden;
+    isolation: isolate;
+    scroll-snap-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0d0d10;
+  }
+  /* Blurred cover as a colour wash */
+  .bg {
+    position: absolute;
+    inset: -20%;
+    z-index: -1;
+    opacity: 0.55;
+  }
+  .bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(50px) saturate(1.6);
+  }
+  .slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.75));
+  }
+
+  /* Centre card is larger, the others step back */
+  @supports (animation-timeline: view(inline)) {
+    .slide {
+      animation: focus linear both;
+      animation-timeline: view(inline);
+    }
+    @keyframes focus {
+      0%, 100% { scale: 0.86; opacity: 0.45; }
+      50% { scale: 1; opacity: 1; }
+    }
+  }
+
+  .top { display: flex; align-items: center; gap: 12px; }
+  .top :global(.icon) { border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, var(--a), var(--b)); box-shadow: 0 0 16px var(--a); }
+  .type {
+    padding: 4px 12px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.12);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    font-size: 13px;
+  }
+  .shot {
+    margin: 24px 0 auto;
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  .shot :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  }
+  .slide:hover .shot { transform: translateY(-6px) scale(1.02); }
+  .title { margin-top: 24px; font-size: 28px; font-weight: 700; line-height: 1.15; }
+  .desc { color: var(--w-80); line-height: 1.45; }
+  .cta {
+    align-self: flex-start;
+    margin-top: 12px;
+    padding: 10px 18px;
+    border-radius: 100px;
+    background: var(--bw-100);
+    color: #000;
+    font-weight: 500;
+    font-size: 14px;
+    transition: box-shadow var(--dur) var(--ease-out);
+  }
+  .slide:hover .cta { box-shadow: 0 0 24px color-mix(in srgb, var(--a) 70%, transparent); }
+
+  .controls { display: flex; justify-content: center; gap: 12px; }
+  .controls button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--bw-100);
+    font: inherit;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+  }
+  .controls button:hover { background: var(--bw-100); color: #000; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide { animation: none; }
+    .shot, .cta { transition: none; }
+  }
+</style>
+
+<script>
+  const track = document.querySelector<HTMLElement>('.carousel .track')!;
+  document.querySelectorAll<HTMLButtonElement>('.carousel [data-dir]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const slide = track.querySelector<HTMLElement>('.slide')!;
+      track.scrollBy({ left: Number(btn.dataset.dir) * (slide.offsetWidth + 24), behavior: 'smooth' });
+    });
+  });
+  // Start on the second card so there is something on both sides.
+  requestAnimationFrame(() => {
+    const second = track.children[1] as HTMLElement | undefined;
+    if (!second) return;
+    // offsetLeft is relative to the track (position: relative) and, unlike
+    // getBoundingClientRect, ignores the focus scale animation.
+    track.scrollLeft = second.offsetLeft - (track.clientWidth - second.offsetWidth) / 2;
+  });
+</script>

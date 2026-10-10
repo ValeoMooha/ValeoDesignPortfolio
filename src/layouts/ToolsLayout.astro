@@ -1,0 +1,26 @@
+---
+// Shared shell for the Tools page design variants.
+import Base from './Base.astro';
+import Background from '../components/Background.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ToolsHero from '../components/tools/ToolsHero.astro';
+import VariantNav from '../components/tools/VariantNav.astro';
+
+interface Props {
+  variant: number;
+  hero?: boolean;
+}
+const { variant, hero = true } = Astro.props;
+---
+
+<Base title="Tools — Valeo" description="Figma plugins, templates and color systems built by Valeo.">
+  <Background />
+  <Header current="tools" />
+  <main>
+    {hero && <ToolsHero />}
+    <slot />
+  </main>
+  <Footer />
+  <VariantNav current={variant} />
+</Base>

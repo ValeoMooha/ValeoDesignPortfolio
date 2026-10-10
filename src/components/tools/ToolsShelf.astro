@@ -1,0 +1,140 @@
+---
+// Variant 3 — Shelf: plugins as App Store style cards with big glossy icons,
+// templates and systems on a horizontal shelf below.
+import { Image } from 'astro:assets';
+import { tools } from '../../data/tools';
+
+const plugins = tools.filter((t) => t.type === 'Plugin');
+const files = tools.filter((t) => t.type !== 'Plugin');
+---
+
+<section class="shelf-page">
+  <h2 class="section">Plugins</h2>
+  <div class="apps">
+    {plugins.map((tool, i) => (
+      <article class="app" style={`--a: ${tool.accent}; --b: ${tool.accent2}; --reveal-i: ${i}`} data-reveal>
+        <div class="app-head">
+          {tool.icon && <Image class="app-icon" src={tool.icon} alt="" width={96} height={96} />}
+          <div>
+            <h3>{tool.title}{tool.emoji && ` ${tool.emoji}`}</h3>
+            <p>{tool.description}</p>
+            <a class="get" href={tool.href} target="_blank" rel="noopener">Get</a>
+          </div>
+        </div>
+        <a class="screen" href={tool.href} target="_blank" rel="noopener" tabindex="-1" data-glow>
+          <Image src={tool.cover} alt="" widths={[400, 800]} sizes="(max-width: 800px) 100vw, 560px" />
+        </a>
+      </article>
+    ))}
+  </div>
+
+  <h2 class="section">Templates &amp; systems</h2>
+  <div class="row" tabindex="0" aria-label="Templates and systems">
+    {files.map((tool, i) => (
+      <a class="file" href={tool.href} target="_blank" rel="noopener" style={`--a: ${tool.accent}; --b: ${tool.accent2}; --reveal-i: ${i}`} data-reveal data-glow>
+        <span class="file-cover">
+          <Image src={tool.cover} alt="" widths={[400, 800]} sizes="420px" />
+        </span>
+        <span class="file-type">{tool.type}</span>
+        <span class="file-title">{tool.title}{tool.emoji && ` ${tool.emoji}`}</span>
+        <span class="file-desc">{tool.description}</span>
+      </a>
+    ))}
+  </div>
+</section>
+
+<style>
+  .shelf-page { max-width: 1200px; margin: clamp(56px, 7vw, 100px) auto 0; padding: 0 24px; }
+  .section {
+    margin: 0 0 24px;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+  }
+  .section:not(:first-child) { margin-top: 80px; }
+
+  .apps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .app {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 28px;
+    border-radius: 28px;
+    background:
+      linear-gradient(160deg, color-mix(in srgb, var(--a) 22%, #0d0d10), #0d0d10 60%);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .app-head { display: flex; gap: 20px; align-items: flex-start; }
+  .app-head :global(.app-icon) {
+    flex: none;
+    border-radius: 22px;
+    box-shadow:
+      0 12px 32px color-mix(in srgb, var(--a) 50%, transparent),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: transform var(--dur) var(--ease-out);
+  }
+  .app:hover :global(.app-icon) { transform: rotate(-6deg) scale(1.06); }
+  h3 { margin: 4px 0 6px; font-size: 22px; line-height: 1.2; }
+  .app p { margin: 0; color: var(--w-60); line-height: 1.45; }
+  .get {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 22px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--bw-100);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+  }
+  .get:hover { background: var(--a); color: #fff; }
+  .screen { display: block; perspective: 1000px; }
+  .screen :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    transform: rotateX(8deg);
+    transform-origin: bottom;
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  .app:hover .screen :global(img) { transform: rotateX(0deg) translateY(-4px); }
+
+  .row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(300px, 420px);
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+  .file {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    scroll-snap-align: start;
+  }
+  .file-cover {
+    display: block;
+    margin-bottom: 12px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+    transition: box-shadow var(--dur) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+  }
+  .file-cover :global(img) { display: block; width: 100%; height: auto; transition: transform var(--dur-slow) var(--ease-out); }
+  .file:hover .file-cover { transform: translateY(-4px); box-shadow: 0 16px 50px color-mix(in srgb, var(--a) 40%, transparent); }
+  .file:hover .file-cover :global(img) { transform: scale(1.04); }
+  .file-type { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: color-mix(in srgb, var(--a) 60%, white); }
+  .file-title { font-size: 18px; font-weight: 700; }
+  .file-desc { color: var(--w-60); font-size: 14px; }
+
+  @media (max-width: 800px) { .apps { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen :global(img), .file-cover, .file-cover :global(img), .app-head :global(.app-icon) { transition: none; }
+  }
+</style>

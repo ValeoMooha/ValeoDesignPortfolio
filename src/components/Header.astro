@@ -1,6 +1,16 @@
 ---
 import ContactButton from './ContactButton.astro';
 import avatar from '../assets/AvatarValeoGIF.gif';
+
+interface Props {
+  current?: 'work' | 'tools' | 'about';
+}
+const { current = 'work' } = Astro.props;
+const items = [
+  { id: 'work', label: 'Work', href: '/' },
+  { id: 'tools', label: 'Tools', href: '/tools/' },
+  { id: 'about', label: 'About', href: 'https://mvaleo.com/about/' },
+];
 ---
 
 <header class="header">
@@ -11,9 +21,15 @@ import avatar from '../assets/AvatarValeoGIF.gif';
     </a>
     <nav class="menu" aria-label="Main">
       <span class="pill" aria-hidden="true"></span>
-      <a href="/" class="active" aria-current="page">Work</a>
-      <a href="https://mvaleo.com/tools/">Tools</a>
-      <a href="https://mvaleo.com/about/">About</a>
+      {items.map((item) => (
+        <a
+          href={item.href}
+          class:list={{ active: item.id === current }}
+          aria-current={item.id === current ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
     </nav>
     <ContactButton />
   </div>
