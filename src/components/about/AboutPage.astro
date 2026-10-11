@@ -1,18 +1,10 @@
 ---
-// Wraps an About variant with the page shell and the variant switcher.
+// Wraps an earlier About concept with the page shell and the concept switcher.
 import PageLayout from '../../layouts/PageLayout.astro';
 import VariantNav from '../VariantNav.astro';
 
-interface Props { variant: number; set?: 'classic' | 'concepts' }
-const { variant, set = 'concepts' } = Astro.props;
-// Current round: the live site's structure with five ways to animate the skill art.
-const classic = [
-  { label: 'Сборка', href: '/about/' },
-  { label: 'Дыхание', href: '/about/c2/' },
-  { label: 'Глубина', href: '/about/c3/' },
-  { label: 'Волна', href: '/about/c4/' },
-  { label: 'Живые', href: '/about/c5/' },
-];
+interface Props { variant: number }
+const { variant } = Astro.props;
 // Earlier concept round, kept for reference.
 const concepts = [
   { label: 'Кино', href: '/about/v1/' },
@@ -30,5 +22,5 @@ const concepts = [
 
 <PageLayout title="About — Valeo" description="Valeo is a multidisciplinary product designer living in Spain." current="about">
   <slot />
-  <VariantNav slot="after" title="About" current={variant} variants={set === 'classic' ? classic : concepts} />
+  <VariantNav slot="after" title="About" current={variant} variants={concepts} />
 </PageLayout>

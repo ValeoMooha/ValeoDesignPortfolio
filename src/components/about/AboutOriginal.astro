@@ -1,0 +1,185 @@
+---
+// About page, one-to-one with the live site (mvaleo.com/about) at 1440px:
+// same blocks, sizes and spacing. Measured from the live page; the font is
+// the site-wide Google Sans Flex instead of the live site's Mont.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { bio, clients, experience, intro, philosophy, photos, skills } from '../../data/about';
+import downloadIcon from '../../assets/about/download-icon.svg?raw';
+
+// The live collage: three columns of two fading sliders each, with these photos
+// (first photo of each slider is the one the live page shows first).
+const byName = (n: number) => photos.find((p) => p.src.includes(`grade-${n}.`)) as ImageMetadata;
+const columns = [
+  [[21, 9, 13, 24, 34], [22, 33, 29, 16]],
+  [[23, 36, 17, 38], [5, 20, 39, 6, 7]],
+  [[3, 40, 1, 2], [37, 26, 19, 27]],
+].map((col) => col.map((slider) => slider.map(byName)));
+---
+
+<section class="hero">
+  <h1>{intro.greeting}<br />{intro.role}<br />{intro.location}</h1>
+  <div class="hero-side">
+    <p class="looking">Looking for full-time<br />remote position</p>
+    <a class="resume" href={intro.resume.href}>
+      <span>{intro.resume.label}</span>
+      <span class="dl" set:html={downloadIcon} />
+    </a>
+  </div>
+</section>
+
+<section class="collage" aria-label="Photos">
+  {columns.map((col, c) => (
+    <div class={`col col-${c}`}>
+      {col.map((slider, s) => (
+        <div class="slider" data-slider={c * 2 + s}>
+          {slider.map((p, i) => (
+            <Image class:list={{ on: i === 0 }} src={p} alt="" widths={[448, 896]} sizes="(max-width: 800px) 50vw, 448px" loading={i === 0 ? 'eager' : 'lazy'} />
+          ))}
+        </div>
+      ))}
+      {c === 2 && <p class="caption">{intro.photosCaption}</p>}
+    </div>
+  ))}
+</section>
+
+<section class="mission">
+  <h2 class="philosophy">{philosophy}</h2>
+  <p class="bio">{bio}</p>
+</section>
+
+<section class="skills">
+  <h2 class="title center">Skills and expertise</h2>
+  <div class="grid">
+    {skills.map((s) => (
+      <article class="skill-box">
+        <div class="skill-image" set:html={s.art} />
+        <h3>{s.lines[0]}<br />{s.lines[1]}</h3>
+        <p>{s.description}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="work">
+  <h2 class="title">Work experience</h2>
+  <div class="table">
+    {experience.map((j) => (
+      <div class="row">
+        <span class="ico" set:html={j.icon} />
+        <span class="cells">
+          <span class="company">{j.company}</span>
+          <span class="role">{j.role}</span>
+          <span class="year">{j.period.replace(' – ', ' - ')}</span>
+        </span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section class="clients">
+  <h2 class="title">Clients</h2>
+  <div class="logos">
+    {clients.map((c) => <div class="logo" title={c.name} set:html={c.logo} />)}
+  </div>
+</section>
+
+<style>
+  /* Two container widths, as on the live site: 1208 for text blocks, 1432 for the collage rows */
+  section { margin: 0 auto; padding: 0 28px; }
+  .hero, .skills, .work, .clients { max-width: 1208px; }
+  .collage, .mission { max-width: 1432px; }
+
+  .title { margin: 0; font-size: 36px; line-height: 1.4; font-weight: 700; letter-spacing: -0.5px; }
+  .center { text-align: center; }
+
+  /* Hero */
+  .hero { display: flex; justify-content: space-between; align-items: flex-start; padding-top: 120px; padding-bottom: 56px; }
+  h1 { margin: 0; font-size: 64px; line-height: 64px; font-weight: 700; }
+  .hero-side { display: flex; flex-direction: column; align-items: flex-end; text-align: right; white-space: nowrap; }
+  .looking { margin: 0 0 24px; font-size: 22px; line-height: 1.4; font-weight: 600; color: rgba(255, 255, 255, 0.5); }
+  .resume { display: flex; align-items: center; gap: 20px; font-size: 22px; line-height: 1.7; font-weight: 600; }
+  .dl { display: block; width: 32px; height: 32px; transition: transform var(--dur) var(--ease-out); }
+  .dl :global(svg) { display: block; width: 32px; height: 32px; }
+  .resume:hover .dl { transform: translateY(3px); }
+
+  /* Collage: columns start lower towards the left */
+  .collage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .col { display: flex; flex-direction: column; gap: 16px; }
+  .col-0 { padding-top: 112px; }
+  .col-1 { padding-top: 56px; }
+  .slider { position: relative; aspect-ratio: 448 / 560; border-radius: 24px; overflow: hidden; }
+  .slider :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s ease; }
+  .slider :global(img.on) { opacity: 1; }
+  .caption { margin: 0; padding: 0 0 0 172.8px; text-align: right; font-size: 13px; line-height: 1.7; font-weight: 600; color: rgba(255, 255, 255, 0.35); }
+
+  /* Philosophy and bio */
+  .mission { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; margin-top: 124px; }
+  .philosophy { margin: 0; padding-right: 40px; font-size: 30px; line-height: 48px; font-weight: 600; }
+  .bio { margin: 0; font-size: 20px; line-height: 38px; font-weight: 600; }
+
+  /* Skills */
+  .skills { margin-top: 140px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
+  .skill-box { display: flex; flex-direction: column; align-items: center; border-radius: 24px; background: rgba(255, 255, 255, 0.08); text-align: center; }
+  /* Grows to the tallest illustration in the row so titles line up, as on the live site */
+  .skill-image { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; padding: 64px 40px 40px; box-sizing: border-box; }
+  .skill-image :global(svg) { display: block; max-width: 100%; height: auto; }
+  h3 { margin: 0; font-size: 28px; line-height: 1.4; font-weight: 700; }
+  .skill-box p { margin: 0; padding: 16px 100px 64px; font-size: 18px; line-height: 26px; font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+
+  /* Work experience */
+  .work { margin-top: 160px; }
+  .table { margin-top: 32px; }
+  .row { display: grid; grid-template-columns: 40px 1fr; gap: 28px; padding: 16px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+  .ico { display: block; width: 40px; height: 40px; }
+  .ico :global(svg) { display: block; width: 40px; height: 40px; }
+  .cells { display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; font-size: 18px; line-height: 1.7; font-weight: 600; }
+  .role { color: rgba(255, 255, 255, 0.6); }
+  .year { color: rgba(255, 255, 255, 0.6); text-align: right; }
+
+  /* Clients */
+  .clients { margin-top: 100px; }
+  .logos { display: grid; grid-template-columns: repeat(5, 1fr); row-gap: 44px; margin-top: 32px; }
+  .logo { display: flex; align-items: flex-start; }
+  .logo :global(svg) { display: block; max-width: 100%; height: auto; }
+
+  @media (max-width: 1100px) {
+    .skill-box p { padding: 16px 40px 48px; }
+  }
+  @media (max-width: 800px) {
+    .hero { flex-direction: column; gap: 32px; padding-top: 64px; }
+    h1 { font-size: 44px; line-height: 1.05; }
+    .hero-side { align-items: flex-start; text-align: left; }
+    .collage { grid-template-columns: 1fr 1fr; }
+    .col { padding-top: 0 !important; }
+    .col-2 { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+    .caption { grid-column: 1 / -1; padding: 0; }
+    .mission, .grid { grid-template-columns: 1fr; }
+    .philosophy { font-size: 24px; line-height: 1.5; padding: 0 0 24px; }
+    .bio { font-size: 17px; line-height: 1.8; }
+    .skill-image { padding: 48px 24px 24px; }
+    .skill-box p { padding: 12px 24px 40px; font-size: 16px; }
+    .cells { grid-template-columns: 1fr auto; }
+    .role { display: none; }
+    .logos { grid-template-columns: repeat(3, 1fr); gap: 32px 16px; }
+  }
+</style>
+
+<script>
+  // Each slider fades to its next photo on its own clock, like the live site's fade sliders.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLElement>('.collage .slider').forEach((slider) => {
+      const imgs = [...slider.querySelectorAll('img')];
+      if (imgs.length < 2) return;
+      let i = 0;
+      setTimeout(() => {
+        setInterval(() => {
+          imgs[i].classList.remove('on');
+          i = (i + 1) % imgs.length;
+          imgs[i].classList.add('on');
+        }, 5000);
+      }, Number(slider.dataset.slider) * 700);
+    });
+  }
+</script>

@@ -1,6 +1,8 @@
 ---
-import AboutPage from '../../components/about/AboutPage.astro';
-import AboutClassic from '../../components/about/AboutClassic.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
+import AboutOriginal from '../../components/about/AboutOriginal.astro';
 ---
 
-<AboutPage variant={1} set="classic"><AboutClassic fx="assemble" /></AboutPage>
+<PageLayout title="About — Valeo" description="Valeo is a multidisciplinary product designer living in Spain." current="about">
+  <AboutOriginal />
+</PageLayout>
