@@ -110,6 +110,15 @@ function resize() {
   state.height = canvas.height;
 }
 
+// Stars fade in on load and fade out over the first screen of scrolling,
+// leaving plain black behind the rest of the page.
+function visibility(time: number) {
+  const intro = reducedMotion ? 1 : 1 - Math.pow(1 - Math.min(time / 1.6, 1), 3);
+  const k = Math.min(scrollY / innerHeight, 1);
+  const fade = 1 - k * k * (3 - 2 * k);
+  return intro * fade;
+}
+
 let start = 0;
 let last = 0;
 function tick(now: number) {
@@ -131,10 +140,15 @@ function tick(now: number) {
   const cEase = 1 - Math.pow(0.15, state.dt);
   for (let i = 0; i < 3; i++) state.color[i] += (target.color[i] - state.color[i]) * cEase;
 
-  gl.viewport(0, 0, state.width, state.height);
-  gl.clearColor(0, 0, 0, 1);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-  scene.frame(state);
+  const opacity = visibility(state.time);
+  host.style.opacity = opacity.toFixed(3);
+  // Nothing to draw once the stars are gone; keep the loop alive to fade back in.
+  if (opacity > 0.001) {
+    gl.viewport(0, 0, state.width, state.height);
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    scene.frame(state);
+  }
 
   if (!reducedMotion) raf = requestAnimationFrame(tick);
 }
@@ -160,6 +174,7 @@ export function startBackground() {
 }
 
 addEventListener('resize', resize);
+if (reducedMotion) addEventListener('scroll', () => { host.style.opacity = visibility(3).toFixed(3); }, { passive: true });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) cancelAnimationFrame(raf);
   else if (!reducedMotion && scene) { last = performance.now(); raf = requestAnimationFrame(tick); }

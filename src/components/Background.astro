@@ -9,12 +9,11 @@
     pointer-events: none;
     /* Own compositing layer, so the browser keeps it painted while the page scrolls */
     transform: translateZ(0);
+    /* Opacity is driven by the script: fade in on load, fade out while scrolling */
     opacity: 0;
-    animation: bg-in 1.6s var(--ease-out) 0.1s forwards;
   }
   .bg :global(canvas) { display: block; width: 100%; height: 100%; }
   .bg.off { display: none; }
-  @keyframes bg-in { to { opacity: 1; } }
 
   .card-glow {
     position: fixed;
