@@ -26,6 +26,9 @@ body {
 }
 
 a { color: inherit; text-decoration: none; }
+
+/* Page content sits above the fixed star background */
+body > main, body > footer { position: relative; z-index: 1; }
 a:focus-visible { outline: 2px solid var(--bw-100); outline-offset: 4px; border-radius: 8px; }
 
 /* Motion */
