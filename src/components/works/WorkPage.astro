@@ -1,0 +1,103 @@
+---
+// Shell for a case study ported from mvaleo.com/works/<slug>. The markup is the
+// original page and the styles are the original CSS scoped under .zc: shared
+// rules in works-base.css, the page's own rules imported by the page file.
+import PageLayout from '../../layouts/PageLayout.astro';
+import '../../styles/works-base.css';
+
+interface Props {
+  title: string;
+  description: string;
+  raw: string;
+}
+const { title, description, raw } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const html = raw.replaceAll('%BASE%', base);
+---
+
+<PageLayout title={title} description={description} current="work">
+  <div class="zc" set:html={html} />
+</PageLayout>
+
+<style is:global>
+  .zc {
+    color: var(--bw-100);
+    font-family: var(--font);
+  }
+</style>
+
+<script>
+  import Splide from '@splidejs/splide';
+
+  // The original sliders (fade or slide, with dots) run on Splide with the
+  // config stored in each element's data-x-slider attribute.
+  document.querySelectorAll<HTMLElement>('.zc .x-slider').forEach((el) => {
+    const slides = [...el.querySelectorAll<HTMLElement>('.splide__slide')];
+    const ids = slides.map((s) => s.id);
+
+    // Fade slides of different heights make the page jump on every change, so
+    // all slides are given the height of the tallest one and centred in it.
+    const equalize = () => {
+      const real = slides.filter((s) => !s.classList.contains('splide__slide--clone'));
+      real.forEach((s) => (s.style.minHeight = ''));
+      const tallest = Math.max(0, ...real.map((s) => s.getBoundingClientRect().height));
+      real.forEach((s) => {
+        s.style.minHeight = `${tallest}px`;
+        s.style.alignItems = 'center';
+      });
+    };
+
+    try {
+      const { rawConfig } = JSON.parse(el.dataset.xSlider ?? '{}');
+      const config = { ...rawConfig };
+      delete config.lazyLoad;
+      delete config.preloadPages;
+      if (config.interval) config.interval = Number(config.interval);
+      const splide = new Splide(el, config);
+      splide.on('mounted', () => {
+        // Splide renames slides, which would detach the #id rules of the original CSS
+        const renamed = new Map<string, string>();
+        slides.forEach((s, i) => {
+          if (!ids[i]) return;
+          renamed.set(s.id, ids[i]);
+          s.id = ids[i];
+        });
+        el.querySelectorAll('[aria-controls]').forEach((b) => {
+          const id = renamed.get(b.getAttribute('aria-controls') ?? '');
+          if (id) b.setAttribute('aria-controls', id);
+        });
+        equalize();
+      });
+      splide.mount();
+      el.querySelectorAll('img').forEach((img) => img.addEventListener('load', equalize));
+      let width = el.clientWidth;
+      new ResizeObserver(() => {
+        if (el.clientWidth === width) return;
+        width = el.clientWidth;
+        equalize();
+      }).observe(el);
+    } catch {
+      /* a broken slider config just leaves the first slide showing */
+    }
+  });
+
+  // Videos and the YouTube embed only load and play while they are near the screen.
+  const lazy = document.querySelectorAll<HTMLVideoElement | HTMLIFrameElement>('.zc [data-src]');
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const { target, isIntersecting } of entries) {
+        if (target instanceof HTMLVideoElement) {
+          if (isIntersecting) {
+            if (!target.src) target.src = target.dataset.src!;
+            target.muted = true;
+            target.play().catch(() => {});
+          } else target.pause();
+        } else if (isIntersecting && !target.src) {
+          target.src = (target as HTMLElement).dataset.src!;
+        }
+      }
+    },
+    { rootMargin: '400px 0px' },
+  );
+  lazy.forEach((el) => io.observe(el));
+</script>
