@@ -1,0 +1,65 @@
+---
+// Zencastr case study, ported as-is from mvaleo.com/works/zencastr. The markup is
+// the original page (src/content/zencastr.html) and its styles are the original
+// CSS pruned to what the page uses and scoped under .zc (src/styles/zencastr.css).
+import PageLayout from '../../layouts/PageLayout.astro';
+import '../../styles/zencastr.css';
+import raw from '../../content/zencastr.html?raw';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const html = raw.replaceAll('%BASE%', base);
+---
+
+<PageLayout
+  title="Zencastr — Valeo"
+  description="Built Zencastr's design department from scratch: rebranding, an Atomic UI design system, web and iOS product design."
+  current="work"
+>
+  <div class="zc" set:html={html} />
+</PageLayout>
+
+<style is:global>
+  .zc {
+    color: var(--bw-100);
+    font-family: var(--font);
+  }
+</style>
+
+<script>
+  import Splide from '@splidejs/splide';
+
+  // The original sliders (fade or slide, with dots) run on Splide with the
+  // config stored in each element's data-x-slider attribute.
+  document.querySelectorAll<HTMLElement>('.zc .x-slider').forEach((el) => {
+    try {
+      const { rawConfig } = JSON.parse(el.dataset.xSlider ?? '{}');
+      const config = { ...rawConfig };
+      delete config.lazyLoad;
+      delete config.preloadPages;
+      if (config.interval) config.interval = Number(config.interval);
+      new Splide(el, config).mount();
+    } catch {
+      /* a broken slider config just leaves the first slide showing */
+    }
+  });
+
+  // Videos and the YouTube embed only load and play while they are near the screen.
+  const lazy = document.querySelectorAll<HTMLVideoElement | HTMLIFrameElement>('.zc [data-src]');
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const { target, isIntersecting } of entries) {
+        if (target instanceof HTMLVideoElement) {
+          if (isIntersecting) {
+            if (!target.src) target.src = target.dataset.src!;
+            target.muted = true;
+            target.play().catch(() => {});
+          } else target.pause();
+        } else if (isIntersecting && !target.src) {
+          target.src = (target as HTMLElement).dataset.src!;
+        }
+      }
+    },
+    { rootMargin: '400px 0px' },
+  );
+  lazy.forEach((el) => io.observe(el));
+</script>
