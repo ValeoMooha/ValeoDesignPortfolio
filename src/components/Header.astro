@@ -43,12 +43,14 @@ const items = [
 
 <div class="drawer" id="mobile-menu" aria-hidden="true" inert>
   <nav class="drawer-nav" aria-label="Mobile">
-    {[...items, { id: 'contact', label: 'Contact', href: base + '/contact/' }].map((item) => (
-      <a href={item.href} aria-current={item.id === current ? 'page' : undefined}>{item.label}</a>
+    {[...items, { id: 'contact', label: 'Contact', href: base + '/contact/' }].map((item, i) => (
+      <a href={item.href} aria-current={item.id === current ? 'page' : undefined} style={`--i: ${i}`}>
+        <span>{item.label}</span>
+      </a>
     ))}
   </nav>
   <nav class="drawer-social" aria-label="Social">
-    {socials.map((l) => <a href={l.href} rel="noopener" target="_blank">{l.label}</a>)}
+    {socials.map((l, i) => <a href={l.href} rel="noopener" target="_blank" style={`--i: ${i}`}>{l.label}</a>)}
   </nav>
 </div>
 
@@ -146,7 +148,10 @@ const items = [
   .burger[aria-expanded='true'] span:first-child { top: 24px; transform: rotate(45deg); }
   .burger[aria-expanded='true'] span:last-child { top: 24px; transform: rotate(-45deg); }
 
+  /* The drawer blooms out of the icon as a growing circle; the links then
+     slide up out of their own lines, one after another. */
   .drawer {
+    --origin: calc(100% - 38px) 32px;
     position: fixed;
     inset: 0;
     z-index: 9; /* under the header, so the logo and the icon stay on top */
@@ -154,20 +159,45 @@ const items = [
     flex-direction: column;
     justify-content: space-between;
     padding: 100px 24px 32px;
-    background: var(--bw-0);
+    background:
+      radial-gradient(120% 60% at 100% 100%, rgba(228, 103, 228, 0.18), transparent 60%),
+      radial-gradient(90% 50% at 0% 0%, rgba(90, 110, 255, 0.14), transparent 60%),
+      var(--bw-0);
     overflow-y: auto;
-    transform: translateY(-100%);
-    transition: transform 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+    clip-path: circle(0px at var(--origin));
+    visibility: hidden;
+    transition:
+      clip-path 0.6s cubic-bezier(0.77, 0, 0.175, 1),
+      visibility 0s 0.6s;
   }
-  .drawer.open { transform: none; }
+  .drawer.open {
+    clip-path: circle(150vmax at var(--origin));
+    visibility: visible;
+    transition:
+      clip-path 0.85s cubic-bezier(0.77, 0, 0.175, 1),
+      visibility 0s;
+  }
   .drawer-nav { display: flex; flex-direction: column; }
   .drawer-nav a {
+    display: block;
+    overflow: hidden;
     padding: 0 8px;
     font-weight: 700;
     font-size: 12vw;
     line-height: 15vw;
     color: var(--bw-100);
     transition: color var(--dur-fast);
+  }
+  .drawer-nav a span {
+    display: block;
+    transform: translateY(105%) rotate(7deg);
+    transform-origin: 0 100%;
+    transition: transform 0.35s cubic-bezier(0.5, 0, 0.75, 0);
+  }
+  .drawer.open .drawer-nav a span {
+    transform: none;
+    transition:
+      transform 0.9s var(--ease-out) calc(0.28s + var(--i) * 80ms);
   }
   .drawer-social {
     display: grid;
@@ -181,7 +211,20 @@ const items = [
     font-weight: 600;
     font-size: 16px;
     line-height: 27px;
-    transition: color var(--dur-fast);
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.25s,
+      transform 0.25s,
+      color var(--dur-fast);
+  }
+  .drawer.open .drawer-social a {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.6s calc(0.55s + var(--i) * 50ms),
+      transform 0.7s var(--ease-out) calc(0.55s + var(--i) * 50ms),
+      color var(--dur-fast);
   }
   @media (hover: hover) {
     .drawer-nav a:hover { color: #e467e4; }
@@ -201,7 +244,9 @@ const items = [
     .drawer { display: flex; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .drawer, .burger span { transition: none; }
+    .drawer, .drawer.open, .burger span,
+    .drawer-nav a span, .drawer.open .drawer-nav a span,
+    .drawer-social a, .drawer.open .drawer-social a { transition: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .pill, .header { transition: none; }
