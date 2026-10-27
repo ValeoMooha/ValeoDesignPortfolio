@@ -25,30 +25,29 @@ export interface Project {
   href: string;
 }
 
-const work = (slug: string) => `https://mvaleo.com/works/${slug}/`;
-// Case studies already moved to this site
+// Case studies live on this site, ported from mvaleo.com/works/<slug>
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const moved = (slug: string) => `${base}/works/${slug}/`;
 
 export const bigProjects: Project[] = [
   { title: 'Zencastr', category: 'Podcast Recording App', image: zencastr, href: moved('zencastr') },
-  { title: 'Arrivals', category: 'Travel Documentary Vlog', image: arrivals, href: work('arrivals') },
+  { title: 'Arrivals', category: 'Travel Documentary Vlog', image: arrivals, href: moved('arrivals') },
 ];
 
 export const smallProjects: Project[] = [
-  { title: 'VS Color', category: 'VS Code Color Picker', image: vsColor, href: work('vs-color') },
-  { title: 'Telegram', category: 'Messenger Redesign Concept', image: telegram, href: work('telegram') },
-  { title: 'Spotter', category: 'Travel Spots App', image: spotter, href: work('spotter') },
-  { title: 'Chipotto', category: 'Cafe Menu App', image: chipotto, href: work('chipotto') },
-  { title: 'Dieter', category: 'Finance App', image: dieter, href: work('dieter') },
-  { title: 'Smart Tools', category: 'Online Store', image: smartTools, href: work('smart-tools') },
-  { title: 'Assam', category: 'SaaS Software Aggregator', image: assam, href: work('assam') },
-  { title: 'Active', category: 'Activity Tracker App', image: active, href: work('active') },
-  { title: 'Smart Home', category: 'Smart Home App', image: smartHome, href: work('smart-home') },
-  { title: 'TEDx', category: 'TED Recommends Concept', image: tedx, href: work('ted') },
-  { title: 'iWatch', category: 'Apple Watch Screens Concept', image: iwatch, href: work('iwatch') },
-  { title: 'Mindojo', category: 'Educational Platform', image: mindojo, href: work('mindojo') },
-  { title: 'Princess', category: 'Rhythmic Gymnastics School', image: princess, href: work('princess') },
-  { title: 'Serials', category: 'TV Series App', image: serials, href: work('serials') },
-  { title: 'Webbper', category: 'Fitness CRM System', image: webbper, href: work('webbper') },
+  { title: 'VS Color', category: 'VS Code Color Picker', image: vsColor, href: moved('vs-color') },
+  { title: 'Telegram', category: 'Messenger Redesign Concept', image: telegram, href: moved('telegram') },
+  { title: 'Spotter', category: 'Travel Spots App', image: spotter, href: moved('spotter') },
+  { title: 'Chipotto', category: 'Cafe Menu App', image: chipotto, href: moved('chipotto') },
+  { title: 'Dieter', category: 'Finance App', image: dieter, href: moved('dieter') },
+  { title: 'Smart Tools', category: 'Online Store', image: smartTools, href: moved('smart-tools') },
+  { title: 'Assam', category: 'SaaS Software Aggregator', image: assam, href: moved('assam') },
+  { title: 'Active', category: 'Activity Tracker App', image: active, href: moved('active') },
+  { title: 'Smart Home', category: 'Smart Home App', image: smartHome, href: moved('smart-home') },
+  { title: 'TEDx', category: 'TED Recommends Concept', image: tedx, href: moved('ted') },
+  { title: 'iWatch', category: 'Apple Watch Screens Concept', image: iwatch, href: moved('iwatch') },
+  { title: 'Mindojo', category: 'Educational Platform', image: mindojo, href: moved('mindojo') },
+  { title: 'Princess', category: 'Rhythmic Gymnastics School', image: princess, href: moved('princess') },
+  { title: 'Serials', category: 'TV Series App', image: serials, href: moved('serials') },
+  { title: 'Webbper', category: 'Fitness CRM System', image: webbper, href: moved('webbper') },
 ];
