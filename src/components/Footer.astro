@@ -1,17 +1,11 @@
 ---
 import ContactButton from './ContactButton.astro';
-const links = [
-  { label: 'Instagram', href: 'https://www.instagram.com/valeo_mooha/' },
-  { label: 'Telegram', href: 'https://t.me/ValeoMooha' },
-  { label: 'WhatsApp', href: 'https://wa.me/380992637222' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/vmooha/' },
-  { label: 'Dribbble', href: 'https://dribbble.com/Mooha' },
-];
+import { socials } from '../data/socials';
 ---
 
 <footer class="footer">
   <nav class="links" aria-label="Social">
-    {links.map((l) => <a href={l.href} rel="noopener" target="_blank">{l.label}</a>)}
+    {socials.map((l) => <a href={l.href} rel="noopener" target="_blank">{l.label}</a>)}
   </nav>
   <ContactButton />
 </footer>

@@ -1,9 +1,10 @@
 ---
 import ContactButton from './ContactButton.astro';
 import avatar from '../assets/AvatarValeoGIF.gif';
+import { socials } from '../data/socials';
 
 interface Props {
-  current?: 'work' | 'tools' | 'about';
+  current?: 'work' | 'tools' | 'about' | 'contact';
 }
 const { current = 'work' } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -33,8 +34,23 @@ const items = [
       ))}
     </nav>
     <ContactButton />
+    <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </header>
+
+<div class="drawer" id="mobile-menu" aria-hidden="true" inert>
+  <nav class="drawer-nav" aria-label="Mobile">
+    {[...items, { id: 'contact', label: 'Contact', href: base + '/contact/' }].map((item) => (
+      <a href={item.href} aria-current={item.id === current ? 'page' : undefined}>{item.label}</a>
+    ))}
+  </nav>
+  <nav class="drawer-social" aria-label="Social">
+    {socials.map((l) => <a href={l.href} rel="noopener" target="_blank">{l.label}</a>)}
+  </nav>
+</div>
 
 <style>
   .header {
@@ -102,9 +118,90 @@ const items = [
   }
 
 
+  /* Mobile menu: two-bar icon that opens a full-screen drawer */
+  .burger {
+    display: none;
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin-right: -14px; /* the bars, not the tap area, sit on the page gutter */
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--bw-100);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .burger span {
+    position: absolute;
+    left: 14px;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+    transition: all 0.2s cubic-bezier(0.1, 0.82, 0.76, 0.965);
+  }
+  .burger span:first-child { top: 19px; }
+  .burger span:last-child { top: 29px; }
+  .burger[aria-expanded='true'] span:first-child { top: 24px; transform: rotate(45deg); }
+  .burger[aria-expanded='true'] span:last-child { top: 24px; transform: rotate(-45deg); }
+
+  .drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 9; /* under the header, so the logo and the icon stay on top */
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 100px 24px 32px;
+    background: var(--bw-0);
+    overflow-y: auto;
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  .drawer.open { transform: none; }
+  .drawer-nav { display: flex; flex-direction: column; }
+  .drawer-nav a {
+    padding: 0 8px;
+    font-weight: 700;
+    font-size: 12vw;
+    line-height: 15vw;
+    color: var(--bw-100);
+    transition: color var(--dur-fast);
+  }
+  .drawer-social {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(3, auto);
+    margin-top: 48px;
+  }
+  .drawer-social a {
+    padding: 4px 8px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 27px;
+    transition: color var(--dur-fast);
+  }
+  @media (hover: hover) {
+    .drawer-nav a:hover { color: #e467e4; }
+    .drawer-social a:hover { color: #ff66ff; }
+  }
+  /* While the drawer is open the header is just a logo and the close icon */
+  .header.menu-open {
+    background-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom-color: transparent;
+  }
+
   @media (max-width: 600px) {
-    .menu { gap: 0; }
-    .logo span { display: none; }
+    .menu, .inner :global(.contact) { display: none; }
+    .burger { display: block; }
+    .drawer { display: flex; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .drawer, .burger span { transition: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .pill, .header { transition: none; }
@@ -117,11 +214,29 @@ const items = [
   onScroll();
   addEventListener('scroll', onScroll, { passive: true });
 
+  const burger = document.querySelector<HTMLButtonElement>('.burger')!;
+  const drawer = document.querySelector<HTMLElement>('.drawer')!;
+  const setOpen = (open: boolean) => {
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    drawer.classList.toggle('open', open);
+    drawer.toggleAttribute('inert', !open);
+    drawer.setAttribute('aria-hidden', String(!open));
+    header.classList.toggle('menu-open', open);
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+  };
+  burger.addEventListener('click', () => setOpen(burger.getAttribute('aria-expanded') !== 'true'));
+  addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+  matchMedia('(min-width: 601px)').addEventListener('change', (e) => e.matches && setOpen(false));
+  // The page can come back from the bfcache with the drawer still open
+  addEventListener('pageshow', () => setOpen(false));
+
   const menu = document.querySelector<HTMLElement>('.menu')!;
-  const active = menu.querySelector<HTMLElement>('.active')!;
-  const moveTo = (el: HTMLElement) => {
-    menu.style.setProperty('--pill-x', `${el.offsetLeft}px`);
-    menu.style.setProperty('--pill-w', `${el.offsetWidth}px`);
+  // No menu item is active on the Contact page: the pill rests hidden
+  const active = menu.querySelector<HTMLElement>('.active');
+  const moveTo = (el: HTMLElement | null) => {
+    menu.style.setProperty('--pill-x', `${el?.offsetLeft ?? 0}px`);
+    menu.style.setProperty('--pill-w', `${el?.offsetWidth ?? 0}px`);
   };
   document.fonts.ready.then(() => moveTo(active));
   menu.querySelectorAll<HTMLElement>('a').forEach((a) => {

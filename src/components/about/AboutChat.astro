@@ -67,7 +67,7 @@ const thread: Msg[] = [
 
   <div class="replies" data-msg>
     <a href={intro.resume.href}>📄 {intro.resume.label}</a>
-    <a href="https://mvaleo.com/contact/">💬 Say hi</a>
+    <a href={import.meta.env.BASE_URL.replace(/\/$/, '') + '/contact/'}>💬 Say hi</a>
     <a href="https://www.linkedin.com/in/vmooha/" target="_blank" rel="noopener">in LinkedIn</a>
   </div>
 </section>
