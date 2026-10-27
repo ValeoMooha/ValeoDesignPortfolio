@@ -26,9 +26,12 @@ export interface Project {
 }
 
 const work = (slug: string) => `https://mvaleo.com/works/${slug}/`;
+// Case studies already moved to this site
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const moved = (slug: string) => `${base}/works/${slug}/`;
 
 export const bigProjects: Project[] = [
-  { title: 'Zencastr', category: 'Podcast Recording App', image: zencastr, href: work('zencastr') },
+  { title: 'Zencastr', category: 'Podcast Recording App', image: zencastr, href: moved('zencastr') },
   { title: 'Arrivals', category: 'Travel Documentary Vlog', image: arrivals, href: work('arrivals') },
 ];
 

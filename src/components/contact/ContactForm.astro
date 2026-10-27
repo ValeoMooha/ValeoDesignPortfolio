@@ -1,8 +1,8 @@
 ---
 // Contact form, copied from mvaleo.com/contact. The site is static, so the form
-// posts to FORM_ENDPOINT (a form-backend URL); until one is set it tells the
-// visitor to use the social links instead.
-const FORM_ENDPOINT = '';
+// posts to FormSubmit (free, no account): it mails the message to the address in
+// the URL. The first message triggers a one-time activation email to that inbox.
+const FORM_ENDPOINT = 'https://formsubmit.co/ajax/moohavaleo@gmail.com';
 ---
 
 <section class="contact-page">
@@ -22,6 +22,10 @@ const FORM_ENDPOINT = '';
       <label for="message">Message</label>
       <textarea id="message" name="message" placeholder="How can I help you?" spellcheck="false" required></textarea>
     </div>
+    <input type="hidden" name="_subject" value="New message from mvaleo.com" />
+    <input type="hidden" name="_template" value="table" />
+    <input type="hidden" name="_captcha" value="false" />
+    <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <div class="submit">
       <button type="submit">Send</button>
     </div>
@@ -90,6 +94,7 @@ const FORM_ENDPOINT = '';
     border-color: rgba(255, 255, 255, 0.35);
     background: rgba(255, 255, 255, 0.07);
   }
+  .honey { position: absolute; left: -9999px; }
   .submit { display: flex; justify-content: center; width: 100%; }
   button {
     min-width: 102px;
@@ -139,7 +144,8 @@ const FORM_ENDPOINT = '';
         headers: { Accept: 'application/json' },
         body: new FormData(form),
       });
-      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === 'false') throw new Error(String(res.status));
       form.reset();
       status.textContent = 'Thank you! Your message has been sent.';
     } catch {
