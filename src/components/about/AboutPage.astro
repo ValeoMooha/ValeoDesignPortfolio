@@ -6,17 +6,18 @@ import VariantNav from '../VariantNav.astro';
 interface Props { variant: number }
 const { variant } = Astro.props;
 // Earlier concept round, kept for reference.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const concepts = [
-  { label: 'Кино', href: '/about/v1/' },
-  { label: 'Бенто', href: '/about/v2/' },
-  { label: 'Журнал', href: '/about/v3/' },
-  { label: 'Созвездие', href: '/about/v4/' },
-  { label: 'Плёнка', href: '/about/v5/' },
-  { label: 'Рабочий стол', href: '/about/v6/' },
-  { label: 'Тоннель', href: '/about/v7/' },
-  { label: 'Чат', href: '/about/v8/' },
-  { label: 'Горизонт', href: '/about/v9/' },
-  { label: 'Карточка', href: '/about/v10/' },
+  { label: 'Кино', href: base + '/about/v1/' },
+  { label: 'Бенто', href: base + '/about/v2/' },
+  { label: 'Журнал', href: base + '/about/v3/' },
+  { label: 'Созвездие', href: base + '/about/v4/' },
+  { label: 'Плёнка', href: base + '/about/v5/' },
+  { label: 'Рабочий стол', href: base + '/about/v6/' },
+  { label: 'Тоннель', href: base + '/about/v7/' },
+  { label: 'Чат', href: base + '/about/v8/' },
+  { label: 'Горизонт', href: base + '/about/v9/' },
+  { label: 'Карточка', href: base + '/about/v10/' },
 ];
 ---
 
