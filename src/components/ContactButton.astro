@@ -1,7 +1,7 @@
 ---
 // Contact button used in the header and the footer. On hover a constellation
 // lights up around it.
-const href = 'https://mvaleo.com/contact/';
+const href = import.meta.env.BASE_URL.replace(/\/$/, '') + '/contact/';
 
 // Stars of the Big Dipper around the button, in px from its centre.
 // The button is about 92 x 32, so stars keep clear of |x| < 48, |y| < 18.

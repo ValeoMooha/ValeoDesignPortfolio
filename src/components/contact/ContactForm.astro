@@ -1,0 +1,151 @@
+---
+// Contact form, copied from mvaleo.com/contact. The site is static, so the form
+// posts to FORM_ENDPOINT (a form-backend URL); until one is set it tells the
+// visitor to use the social links instead.
+const FORM_ENDPOINT = '';
+---
+
+<section class="contact-page">
+  <h1>Contact</h1>
+  <p class="lead">Contact me via this form or any<br />of the social channels below.</p>
+
+  <form class="form" method="post" action={FORM_ENDPOINT || undefined} data-endpoint={FORM_ENDPOINT}>
+    <div class="field half">
+      <label for="name">Name</label>
+      <input id="name" name="name" type="text" placeholder="Your Name" spellcheck="false" autocomplete="name" required />
+    </div>
+    <div class="field half">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" placeholder="Your Email" autocomplete="email" required />
+    </div>
+    <div class="field">
+      <label for="message">Message</label>
+      <textarea id="message" name="message" placeholder="How can I help you?" spellcheck="false" required></textarea>
+    </div>
+    <div class="submit">
+      <button type="submit">Send</button>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<style>
+  .contact-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 100px 24px 0;
+    text-align: center;
+  }
+  h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 1.4;
+  }
+  .lead {
+    margin: 12px 0 40px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #b3b3b3;
+  }
+  .form {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 608px;
+    padding: 0 8px;
+    text-align: left;
+  }
+  .field { width: 100%; padding: 0 0 20px; }
+  .half { width: 100%; }
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 22px;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  input, textarea {
+    display: block;
+    width: 100%;
+    padding: 0 12px;
+    font: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--w-80);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: 0.2s;
+  }
+  input { height: 42px; }
+  textarea { height: 153px; padding: 10px 12px; line-height: 1.7; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, 0.28); }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.07);
+  }
+  .submit { display: flex; justify-content: center; width: 100%; }
+  button {
+    min-width: 102px;
+    padding: 10px 17px;
+    font: inherit;
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.2px;
+    color: #212121;
+    background: var(--bw-100);
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  button:hover { opacity: 0.88; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .status { width: 100%; min-height: 24px; margin: 16px 0 0; text-align: center; font-size: 14px; color: var(--w-60); }
+
+  @media (min-width: 768px) {
+    .contact-page { padding-top: 96px; }
+    h1 { font-size: 48px; }
+    .lead { font-size: 20px; line-height: 1.6; }
+    .half { width: 50%; }
+    .half:nth-child(odd) { padding-right: 8px; }
+    .half:nth-child(even) { padding-left: 8px; }
+    button { min-width: 122px; }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('.form')!;
+  const status = form.querySelector<HTMLElement>('.status')!;
+  const button = form.querySelector<HTMLButtonElement>('button')!;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const endpoint = form.dataset.endpoint;
+    if (!endpoint) {
+      status.textContent = 'The form is not connected yet. Please use one of the social channels below.';
+      return;
+    }
+    button.disabled = true;
+    status.textContent = 'Sending…';
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(form),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      form.reset();
+      status.textContent = 'Thank you! Your message has been sent.';
+    } catch {
+      status.textContent = 'Something went wrong. Please try again or use a social channel below.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
