@@ -2,7 +2,11 @@
 // Zencastr case study, ported as-is from mvaleo.com/works/zencastr.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/d0e6c5b6.css';
-import raw from '../../content/works/zencastr.html?raw';
+import '../../styles/works/zencastr-roadmap.css';
+import rawHtml from '../../content/works/zencastr.html?raw';
+import { fixZencastrRoadmap } from '../../lib/zencastr-roadmap';
+
+const raw = fixZencastrRoadmap(rawHtml);
 ---
 
 <WorkPage
