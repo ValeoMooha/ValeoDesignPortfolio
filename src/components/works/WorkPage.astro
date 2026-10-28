@@ -36,19 +36,34 @@ const html = raw.replaceAll('%BASE%', base);
     top: auto;
     right: auto;
     left: 50%;
-    bottom: max(24px, env(safe-area-inset-bottom));
+    bottom: calc(max(24px, env(safe-area-inset-bottom)) + var(--lift, 0px));
     translate: -50% 0;
     z-index: 30;
     transition: background-color 0.25s, scale 0.25s;
   }
   .zc a.backtoportfolioblock.brxe-container:active { scale: 0.96; }
   @media (max-width: 767px) {
-    .zc a.backtoportfolioblock.brxe-container { bottom: max(14px, env(safe-area-inset-bottom)); }
+    .zc a.backtoportfolioblock.brxe-container { bottom: calc(max(14px, env(safe-area-inset-bottom)) + var(--lift, 0px)); }
   }
 </style>
 
 <script>
   import Splide from '@splidejs/splide';
+
+  // Keep the pinned "Back to Portfolio" button above the footer instead of on top of it.
+  const pill = document.querySelector<HTMLElement>('.zc .backtoportfolioblock');
+  const footer = document.querySelector('footer');
+  if (pill && footer) {
+    let queued = false;
+    const lift = () => {
+      queued = false;
+      pill.style.setProperty('--lift', `${Math.max(0, innerHeight - footer.getBoundingClientRect().top)}px`);
+    };
+    const queue = () => !queued && ((queued = true), requestAnimationFrame(lift));
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('resize', queue);
+    lift();
+  }
 
   // The original sliders (fade or slide, with dots) run on Splide with the
   // config stored in each element's data-x-slider attribute.

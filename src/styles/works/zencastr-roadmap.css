@@ -19,7 +19,7 @@
 .zc .zc-rm__node svg { width: 66px; height: 66px }
 
 /* the source article of a stage hangs on the line with a yellow dot */
-.zc .zc-rm__art { position: relative; align-items: flex-end; margin-top: 44px }
+.zc .zc-rm__art.brxe-block { position: relative; align-items: flex-end; align-self: flex-end; width: auto; text-align: right; margin-top: 44px }
 .zc .zc-rm__art::after {
   content: ''; position: absolute; top: 50%; right: -79px; width: 12px; height: 12px; margin-top: -6px;
   border-radius: 50%; background: #ffdd00; box-shadow: 0 0 0 4px #000;
