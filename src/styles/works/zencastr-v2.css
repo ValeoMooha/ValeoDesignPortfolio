@@ -76,21 +76,17 @@
 
 /* ---------- numbers ---------- */
 .zc2 .number-box {
-  position: relative; padding: 22px 30px; border-radius: 28px; isolation: isolate;
-  background: linear-gradient(180deg, rgba(1, 104, 249, 0.1), rgba(1, 104, 249, 0.02));
-  border: 1px solid rgba(1, 104, 249, 0.22);
+  position: relative; padding: 8px 12px; border-radius: 28px; isolation: isolate;
   transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
 }
 .zc2 .number-box::before {
-  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; opacity: 0; transition: opacity 0.4s;
-  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(1, 104, 249, 0.28), transparent 70%);
+  content: ''; position: absolute; inset: -6px; z-index: -1; border-radius: inherit; opacity: 0; transition: opacity 0.4s;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(1, 104, 249, 0.2), transparent 70%);
 }
 .zc2 .number-box:hover::before { opacity: 1; }
-.zc2 .number-box:hover { border-color: rgba(1, 104, 249, 0.55); box-shadow: 0 20px 60px -24px rgba(1, 104, 249, 0.6); }
-.zc2 .number-box.is-tilting { transition: opacity 0.9s var(--ease), translate 1s var(--ease), scale 1s var(--ease), transform 0.12s linear, box-shadow 0.4s, border-color 0.4s; }
+.zc2 .number-box.is-tilting { transition: opacity 0.9s var(--ease), translate 1s var(--ease), scale 1s var(--ease), transform 0.12s linear; }
 .zc2 .work-box-number { font-variant-numeric: tabular-nums; transition: text-shadow 0.4s; }
 .zc2 .number-box:hover .work-box-number { text-shadow: 0 0 44px rgba(1, 104, 249, 0.7); }
-@media (max-width: 767px) { .zc2 .number-box { padding: 14px 16px; border-radius: 20px; } }
 
 /* ---------- design system columns ---------- */
 .zc2 .des-sys-box { transition: opacity 0.9s var(--ease), translate 1s var(--ease), scale 1s var(--ease), transform 0.45s var(--spring); }
@@ -161,3 +157,11 @@
   .zc2 .zc-rm.is-armed .zc-rm__n::before { transform: none; transition: none; }
   .zc2-progress { display: none; }
 }
+
+/* ---------- finer type and 1px borders (bold stays on titles and sub-titles) ---------- */
+.zc.zc2 :where(.brxe-block, .brxe-container, .brxe-heading) { border-width: 1px; }
+.zc.zc2 .brxe-text-basic:not(.rd-yellow-title) { font-weight: 400 !important; }
+.zc.zc2 a.brxe-text-basic { font-weight: 500 !important; }
+.zc.zc2 h6.brxe-heading { font-weight: 500 !important; }
+.zc.zc2 #brxe-hckxru, .zc.zc2 #brxe-dorfdz, .zc.zc2 #brxe-akdzhl { font-weight: 400 !important; }
+.zc.zc2 .work-box-number-title.brxe-heading, .zc.zc2 .backtoportfoliotext.brxe-heading { font-weight: 500 !important; }
