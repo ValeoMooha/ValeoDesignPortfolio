@@ -1,0 +1,33 @@
+---
+// Zencastr case study, version 2: same content as /works/zencastr/ with motion,
+// micro-interactions and optimised images/videos. The original page is untouched.
+import WorkPage from '../../../components/works/WorkPage.astro';
+import '../../../styles/works/d0e6c5b6.css';
+import '../../../styles/works/zencastr-roadmap.css';
+import '../../../styles/works/zencastr-v2-bg.css';
+import '../../../styles/works/zencastr-v2.css';
+import rawHtml from '../../../content/works/zencastr.html?raw';
+import { fixZencastrRoadmap } from '../../../lib/zencastr-roadmap';
+import { optimizeZencastr } from '../../../lib/zencastr-v2';
+
+const raw = optimizeZencastr(fixZencastrRoadmap(rawHtml));
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<WorkPage
+  title="Zencastr v2 — Valeo"
+  description="Zencastr case study, version 2: motion, micro-interactions and faster loading."
+  raw={raw}
+  variant="zc2"
+>
+  <nav slot="before" class="zc2-switch" aria-label="Zencastr versions">
+    <a href={`${base}/works/zencastr/`}>Original</a>
+    <a href={`${base}/works/zencastr/v2/`} aria-current="page">v2</a>
+  </nav>
+</WorkPage>
+
+<div class="zc2-progress" aria-hidden="true"></div>
+
+<script>
+  import '../../../scripts/zencastr-v2';
+</script>

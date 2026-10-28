@@ -1,0 +1,33 @@
+/* Zencastr desktop roadmap: one grid row per stage (see lib/zencastr-roadmap.ts). */
+.zc .zc-rm.brxe-container { width: min(100%, 880px); margin-top: 20px; align-self: center; padding: 0 }
+.zc .zc-rm__list { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column }
+.zc .zc-rm__row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 66px minmax(0, 1fr) }
+
+.zc .zc-rm__l { display: flex; flex-direction: column; align-items: flex-end; text-align: right; padding: 15px 40px 72px 0 }
+.zc .zc-rm__r { padding: 9px 0 72px 32px }
+
+.zc .zc-rm__n { position: relative; display: flex; justify-content: center; align-items: flex-start }
+.zc .zc-rm__n::before {
+  content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; margin-left: -1.5px;
+  border-radius: 2px; background: rgba(255, 255, 255, 0.2);
+}
+.zc .zc-rm__row:last-child .zc-rm__n::before {
+  bottom: auto; height: 130px;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent);
+}
+.zc .zc-rm__node { position: relative; display: block; width: 66px; height: 66px; line-height: 0 }
+.zc .zc-rm__node svg { width: 66px; height: 66px }
+
+/* the source article of a stage hangs on the line with a yellow dot */
+.zc .zc-rm__art { position: relative; align-items: flex-end; margin-top: 44px }
+.zc .zc-rm__art::after {
+  content: ''; position: absolute; top: 50%; right: -79px; width: 12px; height: 12px; margin-top: -6px;
+  border-radius: 50%; background: #ffdd00; box-shadow: 0 0 0 4px #000;
+}
+.zc .zc-rm__art::before {
+  content: ''; position: absolute; top: 50%; right: -73px; width: 73px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 221, 0, 0.45));
+}
+.zc a.zc-rm__art::before, .zc a.zc-rm__art::after { pointer-events: none }
+
+@media (max-width: 767px) { .zc .zc-rm.brxe-container { display: none } }

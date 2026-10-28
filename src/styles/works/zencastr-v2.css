@@ -1,0 +1,163 @@
+/* Zencastr v2: motion layer on top of the original case-study CSS. Everything is scoped
+   to .zc2 and the page is fully readable without it (see .zc2-ready and the reduced
+   motion block at the bottom). Individual transform properties (translate, scale) are
+   used for reveals so they never fight the original CSS or the hover tilt. */
+.zc2 {
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --blue: #0168f9;
+  --yellow: #ffdd00;
+}
+
+/* hidden for the first moments, until the script has prepared the page; the 3s
+   animation is a safety net so a failed script can never leave the page blank */
+.js .zc2:not(.zc2-ready) { opacity: 0; animation: zc2-failsafe 0s 3s forwards; }
+.zc2.zc2-ready { transition: opacity 0.4s ease; }
+@keyframes zc2-failsafe { to { opacity: 1; } }
+
+/* ---------- version switch + progress ---------- */
+.zc2-switch {
+  position: absolute; top: 76px; right: 16px; z-index: 5; display: flex; gap: 2px; padding: 3px;
+  border-radius: 100px; background: rgba(20, 20, 20, 0.7); border: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); font-size: 12px; font-weight: 500;
+}
+.zc2-switch a { padding: 5px 11px; border-radius: 100px; color: var(--w-60); transition: background-color 0.3s, color 0.3s; }
+.zc2-switch a:hover { color: var(--bw-100); }
+.zc2-switch a[aria-current='page'] { background: rgba(255, 255, 255, 0.14); color: var(--bw-100); }
+
+.zc2-progress {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 70; pointer-events: none;
+  background: linear-gradient(90deg, var(--blue), #7fb0ff 55%, var(--yellow));
+  transform-origin: 0 50%; transform: scaleX(var(--p, 0)); will-change: transform;
+}
+
+/* ---------- scroll reveal ---------- */
+.js .zc2 [data-rv] {
+  opacity: 0; translate: 0 32px; scale: 0.985;
+  transition: opacity 0.9s var(--ease), translate 1s var(--ease), scale 1s var(--ease),
+    transform 0.45s var(--ease), box-shadow 0.45s var(--ease), filter 0.45s var(--ease);
+}
+.js .zc2 [data-rv='pop'] { translate: 0 24px; scale: 0.86; transition-timing-function: var(--ease), var(--spring), var(--spring), var(--ease), var(--ease), var(--ease); }
+.js .zc2 [data-rv='frame'] { translate: 0 48px; scale: 0.96; }
+.js .zc2 [data-rv='fade'] { translate: none; scale: none; }
+.js .zc2 [data-rv].is-in { opacity: 1; translate: none; scale: none; }
+
+/* split headings: every word (or letter) rises out of a mask */
+.js .zc2 [data-rv='split'] { opacity: 1; translate: none; scale: none; }
+.zc2 .zc2-w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.04em 0.06em 0.16em; margin: -0.04em -0.06em -0.16em; }
+.zc2 .zc2-wi { display: inline-block; translate: 0 115%; transition: translate 1s var(--ease); transition-delay: calc(var(--i) * 55ms + 80ms); }
+.zc2 [data-rv='split'].is-in .zc2-wi { translate: 0 0; }
+
+/* ---------- hero ---------- */
+.zc2 h6.brxe-heading {
+  transition: opacity 0.9s var(--ease), translate 1s var(--spring), scale 1s var(--spring), background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+.zc2 h6.brxe-heading:hover { background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.55); color: #fff; box-shadow: 0 6px 24px rgba(1, 104, 249, 0.25); translate: 0 -2px; }
+.zc2 #brxe-zqhnrc[data-rv='frame'] { transition-duration: 1.1s, 1.2s, 1.2s, 0.45s, 0.45s, 0.45s; }
+.zc2 .brxe-xproslider { overflow: hidden; box-shadow: 0 30px 80px -30px rgba(1, 104, 249, 0.35); }
+
+/* ---------- images, videos ---------- */
+.zc2 img.brxe-image { cursor: zoom-in; }
+.zc2 .work-big-screen.brxe-image { transition-property: opacity, translate, scale, transform, box-shadow; }
+.zc2 .work-big-screen.brxe-image.is-in:hover { transform: scale(1.012); box-shadow: 0 24px 70px -24px rgba(1, 104, 249, 0.45); }
+.zc2 .web-im.brxe-image.is-in:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 22px 50px -20px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12); }
+.zc2 .splide__slide img.brxe-image { transition: scale 1.2s var(--ease), opacity 0.3s; }
+.zc2 .splide__slide:not(.is-active) img.brxe-image { scale: 1.03; }
+.zc2 video { cursor: pointer; transition: filter 0.4s, transform 0.5s var(--ease); }
+.zc2 video.is-paused { filter: saturate(0.6) brightness(0.8); }
+
+/* slider dots and arrows */
+.zc.zc2 .splide__pagination .splide__pagination__page { transition: width 0.4s var(--spring), background-color 0.3s, transform 0.2s; }
+.zc.zc2 .splide__pagination .splide__pagination__page.is-active { width: 26px; border-radius: 6px; }
+.zc.zc2 .splide__pagination .splide__pagination__page:hover { transform: scale(1.5); }
+.zc.zc2 .splide__arrow { transition: transform 0.3s var(--spring), opacity 0.3s, background-color 0.3s; }
+.zc.zc2 .splide__arrow:hover { transform: scale(1.12); }
+.zc.zc2 .splide__arrow:active { transform: scale(0.94); }
+
+/* ---------- numbers ---------- */
+.zc2 .number-box {
+  position: relative; padding: 22px 30px; border-radius: 28px; isolation: isolate;
+  background: linear-gradient(180deg, rgba(1, 104, 249, 0.1), rgba(1, 104, 249, 0.02));
+  border: 1px solid rgba(1, 104, 249, 0.22);
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+.zc2 .number-box::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; opacity: 0; transition: opacity 0.4s;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(1, 104, 249, 0.28), transparent 70%);
+}
+.zc2 .number-box:hover::before { opacity: 1; }
+.zc2 .number-box:hover { border-color: rgba(1, 104, 249, 0.55); box-shadow: 0 20px 60px -24px rgba(1, 104, 249, 0.6); }
+.zc2 .number-box.is-tilting { transition: opacity 0.9s var(--ease), translate 1s var(--ease), scale 1s var(--ease), transform 0.12s linear, box-shadow 0.4s, border-color 0.4s; }
+.zc2 .work-box-number { font-variant-numeric: tabular-nums; transition: text-shadow 0.4s; }
+.zc2 .number-box:hover .work-box-number { text-shadow: 0 0 44px rgba(1, 104, 249, 0.7); }
+@media (max-width: 767px) { .zc2 .number-box { padding: 14px 16px; border-radius: 20px; } }
+
+/* ---------- design system columns ---------- */
+.zc2 .des-sys-box { transition: opacity 0.9s var(--ease), translate 1s var(--ease), scale 1s var(--ease), transform 0.45s var(--spring); }
+.zc2 .des-sys-box > .brxe-block:first-child { transition: transform 0.5s var(--spring); }
+.zc2 .des-sys-box:hover > .brxe-block:first-child { transform: translateY(-8px) rotate(-5deg) scale(1.08); }
+.zc2 .des-sys-text { transition: color 0.3s; }
+.zc2 .des-sys-box:hover .des-sys-text { color: #fff; }
+
+/* ---------- roadmap ---------- */
+.zc2 .zc-rm__list { position: relative; }
+.zc2 .zc-rm__list::after {
+  content: ''; position: absolute; left: 50%; top: 0; width: 3px; margin-left: -1.5px; border-radius: 2px;
+  height: var(--rm-fill, 0px); background: linear-gradient(var(--yellow), #ff9f1c);
+  box-shadow: 0 0 14px rgba(255, 221, 0, 0.55); pointer-events: none;
+}
+.zc2 .zc-rm__node { z-index: 1; border-radius: 16px; transition: scale 0.6s var(--spring), box-shadow 0.5s, opacity 0.6s; }
+.zc2 .zc-rm__row.is-active .zc-rm__node { scale: 1.1; box-shadow: 0 0 0 1px rgba(255, 221, 0, 0.5), 0 0 40px rgba(255, 221, 0, 0.32); }
+.zc2 .zc-rm__row.is-active .zc-rm__art::after { box-shadow: 0 0 0 4px #000, 0 0 16px rgba(255, 221, 0, 0.9); }
+
+.zc2 .zc-rm.is-armed .zc-rm__row .zc-rm__l,
+.zc2 .zc-rm.is-armed .zc-rm__row .zc-rm__r { opacity: 0; transition: opacity 0.9s var(--ease), translate 1s var(--ease); }
+.zc2 .zc-rm.is-armed .zc-rm__l { translate: -36px 0; }
+.zc2 .zc-rm.is-armed .zc-rm__r { translate: 36px 0; transition-delay: 0.12s; }
+.zc2 .zc-rm.is-armed .zc-rm__node { scale: 0.4; opacity: 0; }
+.zc2 .zc-rm.is-armed .zc-rm__n::before { transform: scaleY(0); transform-origin: 50% 0; transition: transform 1s var(--ease); }
+.zc2 .zc-rm.is-armed .zc-rm__row.is-in .zc-rm__l,
+.zc2 .zc-rm.is-armed .zc-rm__row.is-in .zc-rm__r { opacity: 1; translate: none; }
+.zc2 .zc-rm.is-armed .zc-rm__row.is-in .zc-rm__node { scale: 1; opacity: 1; }
+.zc2 .zc-rm.is-armed .zc-rm__row.is-in .zc-rm__n::before { transform: none; }
+.zc2 .zc-rm.is-armed .zc-rm__row.is-in.is-active .zc-rm__node { scale: 1.1; }
+/* the stage in focus is bright, the rest steps back a little */
+.zc2 .zc-rm.is-armed .zc-rm__row.is-in:not(.is-active) .zc-rm__l > *,
+.zc2 .zc-rm.is-armed .zc-rm__row.is-in:not(.is-active) .zc-rm__r > * { opacity: 0.62; }
+.zc2 .zc-rm__l > *, .zc2 .zc-rm__r > * { transition: opacity 0.5s; }
+.zc2 .zc-rm a { text-decoration-thickness: 1px; text-underline-offset: 3px; transition: text-decoration-color 0.3s, color 0.3s; }
+.zc2 .zc-rm a:hover { color: var(--yellow); }
+
+/* ---------- Back to Portfolio ---------- */
+.zc2 a.backtoportfolioblock.brxe-container {
+  background-color: rgba(255, 255, 255, 0.62); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+  animation: zc2-pill-in 0.8s 0.6s var(--spring) backwards;
+}
+.zc2 .backtoportfolioicon { transition: rotate 0.6s var(--spring); }
+.zc2 a.backtoportfolioblock:hover .backtoportfolioicon { rotate: 90deg; }
+@keyframes zc2-pill-in { from { opacity: 0; translate: -50% 40px; } }
+
+/* ---------- lightbox ---------- */
+.zc2-lb {
+  position: fixed; inset: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0;
+  background: transparent; color: #fff; overflow: auto; overscroll-behavior: contain;
+}
+.zc2-lb::backdrop { background: rgba(0, 0, 0, 0.88); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.zc2-lb[open] { animation: zc2-lb-in 0.35s var(--ease); }
+.zc2-lb[open]::backdrop { animation: zc2-lb-bg 0.35s ease; }
+.zc2-lb__wrap { min-height: 100%; display: grid; place-items: center; padding: 24px; cursor: zoom-out; }
+.zc2-lb img { max-width: min(96vw, 2000px); max-height: calc(100dvh - 48px); width: auto; height: auto; border-radius: 12px; box-shadow: 0 30px 120px rgba(0, 0, 0, 0.8); }
+.zc2-lb.is-tall img { max-height: none; width: min(96vw, 1000px); }
+.zc2-lb__x { position: fixed; top: 16px; right: 16px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.14); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; transition: background-color 0.2s, scale 0.3s var(--spring); }
+.zc2-lb__x:hover { background: rgba(255, 255, 255, 0.28); scale: 1.1; }
+@keyframes zc2-lb-in { from { opacity: 0; scale: 0.96; } }
+@keyframes zc2-lb-bg { from { opacity: 0; } }
+
+/* ---------- reduced motion: everything simply shows ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .js .zc2:not(.zc2-ready) { opacity: 1; animation: none; }
+  .js .zc2 [data-rv], .zc2 .zc2-wi { opacity: 1; translate: none; scale: none; transition: none; }
+  .zc2 .zc-rm.is-armed .zc-rm__l, .zc2 .zc-rm.is-armed .zc-rm__r, .zc2 .zc-rm.is-armed .zc-rm__node { opacity: 1; translate: none; scale: none; transition: none; }
+  .zc2 .zc-rm.is-armed .zc-rm__n::before { transform: none; transition: none; }
+  .zc2-progress { display: none; }
+}

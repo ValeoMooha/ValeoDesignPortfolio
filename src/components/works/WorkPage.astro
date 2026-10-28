@@ -9,20 +9,41 @@ interface Props {
   title: string;
   description: string;
   raw: string;
+  /** extra class on the .zc wrapper, e.g. "zc2" for an alternative version of a page */
+  variant?: string;
 }
-const { title, description, raw } = Astro.props;
+const { title, description, raw, variant } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const html = raw.replaceAll('%BASE%', base);
 ---
 
 <PageLayout title={title} description={description} current="work">
-  <div class="zc" set:html={html} />
+  <slot name="before" />
+  <div class:list={['zc', variant]} set:html={html} />
 </PageLayout>
 
 <style is:global>
   .zc {
     color: var(--bw-100);
     font-family: var(--font);
+    /* room under the last block so the pinned button never covers it */
+    padding-bottom: 72px;
+  }
+  /* "Back to Portfolio": pinned to the bottom of the screen on every case page, as on
+     the original site (the page's own rule only made it sticky inside its container). */
+  .zc a.backtoportfolioblock.brxe-container {
+    position: fixed;
+    top: auto;
+    right: auto;
+    left: 50%;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    translate: -50% 0;
+    z-index: 30;
+    transition: background-color 0.25s, scale 0.25s;
+  }
+  .zc a.backtoportfolioblock.brxe-container:active { scale: 0.96; }
+  @media (max-width: 767px) {
+    .zc a.backtoportfolioblock.brxe-container { bottom: max(14px, env(safe-area-inset-bottom)); }
   }
 </style>
 
