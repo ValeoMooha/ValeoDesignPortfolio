@@ -2,7 +2,10 @@
 // Serials case study, ported as-is from mvaleo.com/works/serials.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/b6d9a452.css';
-import raw from '../../content/works/serials.html?raw';
+import rawHtml from '../../content/works/serials.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'serials');
 ---
 
 <WorkPage

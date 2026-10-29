@@ -39,7 +39,7 @@ export const bio =
 export const stats = [
   { value: '10+', label: 'years in product design' },
   { value: '14', label: 'countries photographed' },
-  { value: '6', label: 'disciplines' },
+  { value: '7', label: 'disciplines' },
 ];
 
 import dsArt from '../assets/about/skills/design-system.svg?raw';
@@ -48,6 +48,7 @@ import uxArt from '../assets/about/skills/ux.svg?raw';
 import brandingArt from '../assets/about/skills/branding.svg?raw';
 import videoArt from '../assets/about/skills/video.svg?raw';
 import marketingArt from '../assets/about/skills/marketing.svg?raw';
+import aiArt from '../assets/about/skills/ai.svg?raw';
 
 export interface Skill {
   title: string;
@@ -108,6 +109,15 @@ export const skills: Skill[] = [
     short: 'Marketing',
     description: 'Market research, target audience analysis, sales funnels, marketing strategy',
     icon: '↗',
+  },
+  {
+    title: 'AI',
+    lines: ['AI', 'Native'],
+    art: aiArt,
+    short: 'AI',
+    description:
+      "I'm AI-native: I build software, make prototypes, generate visual assets, run research, train my own models and automate workflows.",
+    icon: '✧',
   },
 ];
 

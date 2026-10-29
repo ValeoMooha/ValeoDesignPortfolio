@@ -2,7 +2,10 @@
 // VS Color case study, ported as-is from mvaleo.com/works/vs-color.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/5a4966c0.css';
-import raw from '../../content/works/vs-color.html?raw';
+import rawHtml from '../../content/works/vs-color.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'vs-color');
 ---
 
 <WorkPage

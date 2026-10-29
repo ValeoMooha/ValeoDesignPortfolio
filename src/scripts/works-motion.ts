@@ -1,6 +1,6 @@
-// Zencastr v2 motion layer: scroll reveals, split headings, count-up numbers, tilt,
+// Motion layer for the case studies (pages with the .zc2 class): scroll reveals, split headings, count-up numbers, tilt,
 // roadmap progress, scroll progress bar and an image lightbox. Pure progressive
-// enhancement: styles live in styles/works/zencastr-v2.css.
+// enhancement: styles live in styles/works/works-motion.css.
 const root = document.querySelector<HTMLElement>('.zc.zc2');
 
 if (root) {
@@ -66,7 +66,7 @@ if (root) {
     $$('.brxe-xproslider').forEach((s) => s.closest<HTMLElement>('#brxe-zqhnrc') ? tag(s.closest<HTMLElement>('#brxe-zqhnrc')!, 'frame') : tag(s, 'up'));
     $$('.splide.x-slider').forEach((s) => !s.closest('#brxe-zqhnrc') && tag(s, 'up'));
     $$('.brxe-video').forEach((v) => tag(v, 'up'));
-    $$('img.brxe-image').forEach((img) => !inSlider(img) && tag(img, img.classList.contains('web-im') ? 'up' : 'frame'));
+    $$('img.brxe-image, video.brxe-image').forEach((img) => !inSlider(img) && tag(img, img.classList.contains('web-im') ? 'up' : 'frame'));
   }
 
   function split(el: HTMLElement, mode: 'words' | 'letters') {

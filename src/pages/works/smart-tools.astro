@@ -2,7 +2,10 @@
 // Smart tools case study, ported as-is from mvaleo.com/works/smart-tools.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/10fa9a98.css';
-import raw from '../../content/works/smart-tools.html?raw';
+import rawHtml from '../../content/works/smart-tools.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'smart-tools');
 ---
 
 <WorkPage

@@ -4,15 +4,16 @@
 // rules in works-base.css, the page's own rules imported by the page file.
 import PageLayout from '../../layouts/PageLayout.astro';
 import '../../styles/works-base.css';
+import '../../styles/works/works-motion.css';
 
 interface Props {
   title: string;
   description: string;
   raw: string;
-  /** extra class on the .zc wrapper, e.g. "zc2" for an alternative version of a page */
-  variant?: string;
+  /** extra class on the .zc wrapper; "zc2" (default) turns on the motion layer, null keeps the page as ported */
+  variant?: string | null;
 }
-const { title, description, raw, variant } = Astro.props;
+const { title, description, raw, variant = 'zc2' } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const html = raw.replaceAll('%BASE%', base);
 ---
@@ -20,6 +21,7 @@ const html = raw.replaceAll('%BASE%', base);
 <PageLayout title={title} description={description} current="work">
   <slot name="before" />
   <div class:list={['zc', variant]} set:html={html} />
+  {variant === 'zc2' && <div class="zc2-progress" aria-hidden="true" />}
 </PageLayout>
 
 <style is:global>
@@ -49,6 +51,7 @@ const html = raw.replaceAll('%BASE%', base);
 
 <script>
   import Splide from '@splidejs/splide';
+  import '../../scripts/works-motion';
 
   // Keep the pinned "Back to Portfolio" button above the footer instead of on top of it.
   const pill = document.querySelector<HTMLElement>('.zc .backtoportfolioblock');
