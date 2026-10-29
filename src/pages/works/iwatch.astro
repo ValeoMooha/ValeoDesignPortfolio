@@ -2,7 +2,10 @@
 // iWatch case study, ported as-is from mvaleo.com/works/iwatch.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/5a4966c0.css';
-import raw from '../../content/works/iwatch.html?raw';
+import rawHtml from '../../content/works/iwatch.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'iwatch');
 ---
 
 <WorkPage

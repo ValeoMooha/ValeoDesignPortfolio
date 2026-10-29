@@ -2,7 +2,10 @@
 // TED case study, ported as-is from mvaleo.com/works/ted.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/5a4966c0.css';
-import raw from '../../content/works/ted.html?raw';
+import rawHtml from '../../content/works/ted.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'ted');
 ---
 
 <WorkPage

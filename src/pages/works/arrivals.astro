@@ -2,7 +2,10 @@
 // Arrivals case study, ported as-is from mvaleo.com/works/arrivals.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/0241f24e.css';
-import raw from '../../content/works/arrivals.html?raw';
+import rawHtml from '../../content/works/arrivals.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'arrivals');
 ---
 
 <WorkPage

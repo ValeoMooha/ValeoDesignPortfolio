@@ -2,7 +2,10 @@
 // Telegram case study, ported as-is from mvaleo.com/works/telegram.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/5c32eefa.css';
-import raw from '../../content/works/telegram.html?raw';
+import rawHtml from '../../content/works/telegram.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'telegram');
 ---
 
 <WorkPage

@@ -2,7 +2,10 @@
 // Smart Home case study, ported as-is from mvaleo.com/works/smart-home.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/84cab48e.css';
-import raw from '../../content/works/smart-home.html?raw';
+import rawHtml from '../../content/works/smart-home.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'smart-home');
 ---
 
 <WorkPage

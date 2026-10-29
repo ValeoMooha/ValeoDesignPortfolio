@@ -2,7 +2,10 @@
 // Assam case study, ported as-is from mvaleo.com/works/assam.
 import WorkPage from '../../components/works/WorkPage.astro';
 import '../../styles/works/be5f03f4.css';
-import raw from '../../content/works/assam.html?raw';
+import rawHtml from '../../content/works/assam.html?raw';
+import { optimizeWork } from '../../lib/work-optimize';
+
+const raw = optimizeWork(rawHtml, 'assam');
 ---
 
 <WorkPage
